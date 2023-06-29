@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>PAX+ Launcher</title>
+
+    <div class="menu_topBar">
+
+      <div id="mainlogo"></div>
+
+      <div id="mainlogocontainer"></div>
+
+      <div id="mainstatus">
+
+        <h1>Up to date</h1>
+        <div class="loadingBar">
+          <div><p>READY</p></div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </head>
+
+  
+
+  <body style="background-color: #121719; background-color: #05090e;">
+
+    <div id="tech"></div>
+
+    <div class="dialogWindow nohighlight" id="page_1" style="height: 400px;">
+
+        <h1 class="edgeDots">WELCOME</h1>
+
+        <p>
+            <br>
+            Hello there <span style="font-size: 18px; color: #9df2f5">Pilot</span>.
+            <br><br>
+            It looks like it's your first time using
+            <span style="font-size: 18px; color: #9df2f5">PAX+</span>.
+            <br><br>
+            A first-time setup needs to be performed before you can join the fight
+            
+        </p>
+
+        <h2 style="position:absolute; bottom: -18px; width: 93.6%;"> </h2>
+
+        <div style="background-color: #121719;width: 160px; height: 40px; position: absolute; border: solid 0.5px #555C5E; right: 0px;bottom: 11px;">
+
+        <button style="margin-right: 4px;" id="btn_proceed_1">PROCEED</button>
+        
+        </div>
+    
+    </div>
+
+    <div class="dialogWindow nohighlight" id="page_2" style="height: 400px; width: 600px; left: 300px; display: none;">
+
+        <h1 class="edgeDots">SETUP</h1>
+
+        <p>
+            <br>
+            Please select the location of the game executable
+        </p>
+        
+        <table style="margin-left: 20px; width: 400px;">
+
+            <tr>
+
+                <td style="width: 435px; text-align: left; padding-left: 20px; font-size: 13px">C:\Users\John Doe\Desktop\Hawken\HawkenGame.exe</td>
+                <td class="edgeDots" style="width: 90px; font-size: 15px;">
+                <button type="file" id="btn_exeFile">Select</button>
+                <input type="file" id="input_exeFile"hidden/>
+                </td>
+            </tr>
+
+        </table>
+
+        <p>
+            <br><br>
+            You can change it any time in the launcher settings, should you
+            <br> decide to move it.
+            <br>
+            <br>
+            You can also move it now before selecting it.
+        </p>
+
+        <h2 style="position:absolute; bottom: -18px; width: 95.8%;"> </h2>
+
+        <div style="background-color: #121719;width: 160px; height: 40px; position: absolute; border: solid 0.5px #555C5E; right: 0px;bottom: 11px;">
+
+        <button style="margin-right: 4px;" id="btn_proceed_2" >PROCEED</button>
+        
+        </div>
+    
+    </div>
+
+
+    <div class="dialogWindow nohighlight" id="page_3" style="height: 400px; width: 600px; left: 300px; display: none;">
+
+        <h1 class="edgeDots">PREFERENCES</h1>
+
+        <p>
+            <br>
+            Automatically download game config updates when available?
+            <br>
+            <br>
+            You will always be prompted to install downloaded changes.
+            <br>
+            <br>
+        </p>
+
+        <table style="width: 558px; margin-left: 20px;">
+            <tr>
+              <td style="width: 286px;">AUTO UPDATE</td>
+              <td style="width: 150px;">
+                <label class="container">
+                  <input type="checkbox" checked="checked">
+                  <span class="checkmark"></span>
+                </label>
+              </td>
+            </tr>
+        
+        </table>
+
+        <p>
+            <br><br>
+            A game restart is required for changes to take effect.
+        </p>
+
+
+        <h2 style="position:absolute; bottom: -18px; width: 95.8%;"> </h2>
+
+        <div style="background-color: #121719;width: 160px; height: 40px; position: absolute; border: solid 0.5px #555C5E; right: 0px;bottom: 11px;">
+
+        <button style="margin-right: 4px;" id="btn_proceed_3">FINISH</button>
+        
+        </div>
+    
+    </div>
+
+  </body>
+
+
+</html>
