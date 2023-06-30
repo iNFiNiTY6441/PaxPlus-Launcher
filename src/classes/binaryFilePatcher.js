@@ -1,5 +1,6 @@
 const fs = require('fs');
 const util = require('util');
+const { createBackup } = require('./fileUtils');
 const open = util.promisify(fs.open);
 const read = util.promisify(fs.read);
 const write = util.promisify(fs.write);
@@ -130,9 +131,7 @@ class binaryFilePatcher {
      * @returns {Promise<string>} - The path to the backup file.
      */
     async createBackup(fileName, filePath) {
-        const backupFilePath = `${fileName}.backup`;
-        fs.copyFile(filePath, backupFilePath);
-        return backupFilePath;
+        createBackup(fileName, filePath);
     }
 }
 

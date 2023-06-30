@@ -30,6 +30,7 @@
   "dependencies": {
     "dgram": "^1.0.1",
     "electron-squirrel-startup": "^1.0.0",
+    "ini": "^4.1.1",
     "punt": "^2.3.0"
   }
 }
