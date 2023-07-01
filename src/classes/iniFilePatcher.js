@@ -7,6 +7,21 @@ const INI_CONFIGS_PATH = path.join(DOCUMENTS_BASE_PATH, 'My Games', 'Hawken', 'H
 
 /**
  * A class for patching INI files.
+ * 
+ * Example usage:
+ * 
+ * const IniFilePatcher = require('./iniFilePatcher');
+ * const HAWKEN_GAME_INI_PATH = `${IniFilePatcher.INI_CONFIGS_PATH}\\HawkenGame.ini`;
+ * 
+ * const SECTION_ROBOTS = 'Robots.R_PlayerController_Base';
+ * 
+ * const hawkenGameIni = new IniFilePatcher(HAWKEN_GAME_INI_PATH);
+ * 
+ * hawkenGameIni.setValue(SECTION_ROBOTS, 'CockpitLagFactor', 0.0);
+ * hawkenGameIni.setValue(SECTION_ROBOTS, 'FOV_Override', 90.0);
+ * hawkenGameIni.setValue(SECTION_ROBOTS, 'CameraShakeLevel', 0.0);
+ * 
+ * hawkenGameIni.saveConfig();
  */
 class IniFilePatcher {
     /**
@@ -73,7 +88,6 @@ class IniFilePatcher {
         }
 
         currentSection[key] = value;
-        this.saveConfig();
     }
 
     /**
@@ -95,7 +109,6 @@ class IniFilePatcher {
 
         if (currentSection.hasOwnProperty(key)) {
             delete currentSection[key];
-            this.saveConfig();
             return true;
         }
 

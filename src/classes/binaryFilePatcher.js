@@ -8,12 +8,33 @@ const close = util.promisify(fs.close);
 
 
 const UPK_DECOMPRESSOR_TOOL_PATH = "./decompress.exe";
-const BACKUPS_FOLDER_PATH = ".../../HawkenGame/backup";
 const DECOMPRESSED_FOLDER_PATH = "./unpacked";
 
 /**
  * A class for patching binary files.
- * @class
+ * 
+ * Example usage:
+ * 
+ * const binaryFilePatcher = require("./classes/binaryFilePatcher.js");
+ * const replacements = [
+ *  { offset: 0x00638BB2, from: [0x05], to: [0x02] },
+ *  { from: [0x05], to: [0x02] },
+ *  { offset: 0x00638BB2, to: [0x02] },
+ * ]
+ * 
+ * let robotsUFile = new binaryFilePatcher("./testData/Robots.u", replacements, 123_456_789);
+ * 
+ * async function processFile() {
+ *    try {
+ *      await robotsUFile.init();
+ *      await robotsUFile.applyAllPatches();
+ *   } catch (error) {
+ *     console.error('Error occurred:', error);
+ *  }
+ * }
+ * 
+ * processFile();
+ * 
  */
 class binaryFilePatcher {
 
@@ -44,7 +65,16 @@ class binaryFilePatcher {
      * @param {Array} bytesTo - The bytes to replace with.
      */
     addReplacement( offset, bytesFrom, bytesTo ) {
-        this.replacements.push({offset: offset, from: bytesFrom, to: bytesTo});
+        this.replacements.push({offset:offset, from:  Buffer.from(bytesFrom), to: Buffer.from(bytesTo)});
+    }
+
+    /**
+     * Adds a replacement object to the list of replacements.
+     * @param {number} offset - The offset in the file to replace.
+     * @param {Array} bytesTo - The bytes to replace with.
+     */
+    addReplacement( offset, bytesTo ) {
+        this.replacements.push({offset:offset, to: Buffer.from(bytesTo)});
     }
 
     /**
@@ -56,7 +86,7 @@ class binaryFilePatcher {
         let offset = this.baseData.indexOf(Buffer.from(bytesFrom));
         if ( offset == -1 || offset > this.baseData.length ) throw new RangeError(`BytePattern out of bounds for '${this.filePath}'`);
 
-        this.replacements.push({offset: offset, from: bytesFrom, to: bytesTo});
+        this.addReplacement(offset, bytesFrom, bytesTo);
     }
 
     /**
@@ -68,11 +98,19 @@ class binaryFilePatcher {
         try {
             fileDescriptor = await open(this.filePath, 'r+');
             for (const replacement of this.replacements) {
-                const buffer = Buffer.alloc(replacement.from.length);
-                await read(fileDescriptor, buffer, 0, replacement.from.length, replacement.offset);
-                if (buffer.equals(replacement.from)) {
-                    await write(fileDescriptor, replacement.to, 0, replacement.to.length, replacement.offset);
+                const buffer = Buffer.alloc(replacement.to.length);
+                await read(fileDescriptor, buffer, 0, replacement.to.length, replacement.offset);
+
+                if (replacement.from.length !== replacement.to.length) {
+                    console.error(`Replacement length mismatch for '${this.filePath}'`);
                 }
+                
+                if (replacement.from) {
+                    if (!buffer.equals(replacement.from)) {
+                        console.error(`Replacement mismatch for '${this.filePath}'`);
+                    }
+                }
+                await write(fileDescriptor, replacement.to, 0, replacement.to.length, replacement.offset);
             }
         } catch (err) {
             console.error('File could not be opened:', err);
