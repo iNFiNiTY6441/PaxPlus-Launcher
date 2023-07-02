@@ -13,7 +13,7 @@ const replacements = [
     { offset: 0x0054e573, from: [0xC0, 0x40], to: [0xD0, 0x40] }, //Increase MG turret damage to 6.5
     { offset: 0x0054e58D, from: [0x2C, 0x01], to: [0xC6, 0x00] }, //Decrease Turret initial Health to 198
     { offset: 0x0054e5A9, from: [0x2C, 0x01], to: [0xC6, 0x00] }, //Decrease Turret max Health to 198    
-    { offset: 0x0054E6D2, from: [0x98, 0x3A], to: [0x2C, 0xEC] }, //Decrease Turret MaxTargetDistance to 11500
+    { offset: 0x0054E6D2, from: [0x98, 0x3A], to: [0xEC, 0x2C] }, //Decrease Turret MaxTargetDistance to 11500
 
     { offset: 0x0055530A, from: [0x58, 0x02], to: [0x3F, 0x02] }, //Change Blockade Health to 575
     { offset: 0x00555328, from: [0x80, 0x3F], to: [0x80, 0x3E] }, //Change Blockade ShieldSize to 0.25x
