@@ -1,5 +1,5 @@
-const HawkenEngineIni = require("./src/classes/HawkenEngineIni");
-const HawkenGameIni = require("./src/classes/HawkenGameIni");
+const HawkenEngineIni = require("../src/classes/HawkenEngineIni");
+const HawkenGameIni = require("../src/classes/HawkenGameIni");
 const HawkenSystemSettingsIni = require("./src/classes/HawkenSystemSettingsIni");
 
 
