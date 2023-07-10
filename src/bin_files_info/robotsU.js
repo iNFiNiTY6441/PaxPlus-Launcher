@@ -52,11 +52,18 @@ const replacements = [
 
     //Mech Properties 
     { offset: 0x006550CA, from: [0x04], to: [0x0B] }, //Enable Turret Mode
+    { offset: 0x00655D03, from: [0x04], to: [0x0B] }, //Enable item usage in Turret Mode
+    { offset: 0x00592315, from: [0x04], to: [0x0B] }, //Enable cycle to next item in Turret Mode
+    { offset: 0x005924CF, from: [0x04], to: [0x0B] }, //Enable cycle to prev item in Turret Mode
+    { offset: 0x0065D259, from: [0x27], to: [0x28] }, //Show Cockpit Mesh when in Turret Mode
+    { offset: 0x0065D281, from: [0x27], to: [0x28] }, //Show Primary Weapon Mesh when in Turret Mode
+    { offset: 0x0065D295, from: [0x27], to: [0x28] }, //Show Secondary Weapon  Mesh when in Turret Mode
     { offset: 0x0066A75B, from: [0x66, 0x66, 0xE6, 0x3F], to: [0x00, 0x00, 0x00, 0x00] }, //Remove iframes from turret mode transformation
     { offset: 0x0066A777, from: [0x00, 0x00, 0xC0, 0x3F], to: [0x7B, 0x14, 0x6E, 0x3F] }, //Increase HeavyModeEndTime transformation speed to 0.93s
     { offset: 0x0066A7AF, from: [0x00, 0x00, 0x40, 0x40], to: [0x7B, 0x14, 0x6E, 0x3F] }, //Increase HeavyModeStartTime transformation speed to 0.93s
     { offset: 0x016AA27A, from: [0x44, 0x44, 0xC4, 0x3F], to: [0x8F, 0xC2, 0x75, 0x3F] }, //Increase HeavyModeEndTime animation speed to 0.96s
     { offset: 0x0157FB93, from: [0xCD, 0xCC, 0x4C, 0x40], to: [0xD7, 0xA3, 0x90, 0x3F] }, //Increase HeavyModeStartTime animation speed to 1.13s
+    { offset: 0x017A886A, from: [0xCD, 0xCC, 0x4C, 0x40], to: [0xD7, 0xA3, 0x90, 0x3F] }, //Increase ShieldMode_FPS animation speed to 1.13s
     { offset: 0x00682640, from: [0x48, 0x43], to: [0xC8, 0x43] }, //Increase base turret mode speed from 200 to 400
     { offset: 0x006690B7, from: [0x00, 0x00, 0xAF, 0x43], to: [0x00, 0x00, 0x2F, 0x44] }, //Increase R_Pawn ThrusterVerticalSpeed to 700
     { offset: 0x0066AD9F, from: [0x00, 0x00, 0xD2, 0x43], to: [0x00, 0x80, 0x9D, 0x44] } //Increase R_Pawn AccelRate to 1260
