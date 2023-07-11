@@ -49,6 +49,10 @@ const replacements = [
         from: [0x1C, 0x29, 0x25, 0x00, 0x00, 0x00, 0x71, 0x33, 0x00, 0x00, 0x16],
         to: [0x1C, 0x03, 0xFC, 0xFF, 0xFF, 0x00, 0x3B, 0x00, 0x00, 0x00, 0x16]
     }, //Change Repair Torch from super.Tick(DeltaTime); to super(Actor).Tick(DeltaTime); Hopefully allows mode switching to work correctly.
+    { offset: 0x006BE108, from: [0x93], to: [0x8F] }, //Replace Seeker 1st Person Model with HEAT Cannon Model
+    { offset: 0x006BE0EC, from: [0x94], to: [0x90] }, //Replace Seeker 3rd Person Model with HEAT Cannon Model
+    { offset: 0x006BEB9D, from: [0x64], to: [0x4B] }, //Replace Slug Rifle recoil animation with SA-Hawkins
+    { offset: 0x006BFFBC, from: [0x67], to: [0x4B] }, //Replace Sabot Rifle recoil animation with SA-Hawkins
 
     //Mech Properties 
     { offset: 0x006550CA, from: [0x04], to: [0x0B] }, //Enable Turret Mode
