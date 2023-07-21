@@ -74,10 +74,10 @@ const replacements = [
     { offset: 0x0066A75B, from: [0x66, 0x66, 0xE6, 0x3F], to: [0x00, 0x00, 0x00, 0x00] }, //Remove iframes from turret mode transformation
     { offset: 0x0066A777, from: [0x00, 0x00, 0xC0, 0x3F], to: [0x7B, 0x14, 0x6E, 0x3F] }, //Increase HeavyModeEndTime transformation speed to 0.93s
     { offset: 0x0066A7AF, from: [0x00, 0x00, 0x40, 0x40], to: [0x7B, 0x14, 0x6E, 0x3F] }, //Increase HeavyModeStartTime transformation speed to 0.93s
-    { offset: 0x00682640, from: [0x48, 0x43], to: [0xC8, 0x43] }, //Increase base turret mode speed from 200 to 400
+    { offset: 0x00669199, from: [0x48, 0x43], to: [0xE1, 0x43] }, //Increase base turret mode speed from 200 to 450
     { offset: 0x006690B7, from: [0x00, 0x00, 0xAF, 0x43], to: [0x00, 0x00, 0x2F, 0x44] }, //Increase R_Pawn ThrusterVerticalSpeed to 700
     { offset: 0x0066AD9F, from: [0x00, 0x00, 0xD2, 0x43], to: [0x00, 0x80, 0x9D, 0x44] }, //Increase R_Pawn AccelRate to 1260
-
+    
     //Audio
     { offset: 0x05DEFDDC, from: [0x3F], to: [0x00] }, //Change Hellfires min SoundNodeDelay to 0 //These fix the sounds playing twice on firing the Seeker
     { offset: 0x05DEFDF8, from: [0x3F], to: [0x00] }, //Change Hellfires max SoundNodeDelay to 0 //Alternatively, could choose another firing sound.
