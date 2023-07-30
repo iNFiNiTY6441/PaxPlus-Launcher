@@ -240,7 +240,7 @@ class LauncherCore {
             return this.showPage( "menu/error", { errorHeading: "Invalid game ini directory.", errorMessage: this.iniPath+" does not exist", actionName:"OK", actionURL: "/menu/play" } );
         }
 
-        
+
         this.patchManager.setGamePath( gameInstallationDirectory );
 
         // UPDATE & SET PATCH DATA
@@ -384,7 +384,7 @@ class LauncherCore {
 
         // Get game servers
         this.showPage( "loading", { progress: 0.8, loadingText: "Setting masterserver." } );
-        this.serverData = new RemoteDataManager( "http://78.47.61.126:9000/serverListings" );
+        this.serverData = new RemoteDataManager( "http://paxhawken.ddns.net:9000/serverListings" );
 
         this.showPage( "loading", { progress: 1.0, loadingText: "Loading complete." } );
 
