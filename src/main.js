@@ -1,8 +1,10 @@
 const { app, ipcMain, dialog, BrowserWindow } = require('electron');
-const path = require('path');
 
-const os = require("os");
-const fs = require("fs");
+const LauncherCore = require('./classes/launcherCore.js');
+
+const remoteDataEndpoint = "https://infinity6441.github.io/PaxPlus-Launcher-Remote";
+
+var LAUNCHER_CORE = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -15,74 +17,39 @@ const createWindow = async () => {
     width: 1200,
     height: 720,
     webPreferences: {
-      preload: SETUP_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
     resizable: false,
-    frame:false
-    
   });
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
   mainWindow.setMenu(null)
 
-  // ipcMain.handle('dialog', (event, method, params) => {       
-  //   dialog[method](params);
-  // });
 
-  ipcMain.on('kek', () => {
-    console.log("KEK!")
-  });
-
-  ipcMain.on('firstTime_finish', (event, setupData) => {
-    console.log("SETUP DONE")
-    console.log(setupData);
-    mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-  });
-
-  // and load the index.html of the app.
-  mainWindow.loadURL(SETUP_WINDOW_WEBPACK_ENTRY);
-
-  //mainWindow.webContents.send('message', {'SAVED': 'File Saved'});
-  
-};
-
-
-async function startup_getUserConfig(){
-
-  console.log("[STARTUP]: Getting userConfig");
-
-  let userHome = os.homedir();
-
-  let configPath = userHome+"/paxplus_launcher/userConfiguration.json"
-
-
-  if ( !fs.existsSync( configPath ) ) {
-    console.log("[STARTUP]: No userConfig!");
-    await setup_firstTime()
-  }
-
-
-}
-
-async function setup_firstTime() {
-
-  dialog.showOpenDialog({
-    properties: ['openFile', 'multiSelections']
-  }, function (files) {
-    if (files !== undefined) {
-        // handle files
+  // OPEN ALL EXTERNAL HREF LINKS IN DEFAULT BROWSER INSTEAD OF THE ELECTRON APP
+  var handleRedirect = (e, url) => {
+    if(url != mainWindow.webContents.getURL()) {
+      e.preventDefault()
+      require('electron').shell.openExternal(url)
     }
+  }
+  
+  mainWindow.webContents.on('will-navigate', handleRedirect)
+  mainWindow.webContents.on('new-window', handleRedirect)
+
+  LAUNCHER_CORE = new LauncherCore( remoteDataEndpoint, mainWindow );
+  LAUNCHER_CORE.showPage( "loading", { progress: 0.0, loadingText: "Starting core functions." } );
+  LAUNCHER_CORE.initialize().catch(error => {
+    console.log(error)
+    LAUNCHER_CORE.showPage( "critical", { errorHeading: "FATAL INIT ERROR", errorMessage: "Contact support or reinstall launcher." } );
   });
-}
+};
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async function(){
-
-  //await startup_getUserConfig();
-
   createWindow();
 });
 

@@ -1,10 +1,14 @@
 const fs = require('fs');
+const path = require('path');
 const util = require('util');
-const { createBackup } = require('./fileUtils');
+const { createBackup, restoreBackup, isSize } = require('./fileUtils');
 const open = util.promisify(fs.open);
 const read = util.promisify(fs.read);
 const write = util.promisify(fs.write);
 const close = util.promisify(fs.close);
+const stat = util.promisify(fs.stat);
+const copyFile = util.promisify(fs.copyFile);
+const exec = util.promisify(require('child_process').exec);
 
 
 const UPK_DECOMPRESSOR_TOOL_PATH = "./decompress.exe";
@@ -55,6 +59,7 @@ class binaryFilePatcher {
      * @async
      */
     async init() {
+        console.log("INIT!!")
         this.baseData = open(this.filePath, 'r+');
     }
 
@@ -103,11 +108,22 @@ class binaryFilePatcher {
 
                 if (replacement.from.length !== replacement.to.length) {
                     console.error(`Replacement length mismatch for '${this.filePath}'`);
+                    if(replacement.comment) console.error( replacement.comment )
+                    console.log(`Expected ${replacement.from.length} but got ${replacement.to.length}`);
                 }
                 
                 if (replacement.from) {
                     if (!buffer.equals(replacement.from)) {
-                        console.error(`Replacement mismatch for '${this.filePath}'`);
+                        console.error("\r\n=-=-=-=-=-=-=-=- BINARY PATCH ERROR =-=-=-=-=-=-=-=-")
+                        console.error(`Replacement mismatch for '${path.basename(this.filePath)}'`);
+                        if(replacement.comment) console.error( "("+replacement.comment+")\r\n" )
+                        console.error("Expected:");
+                        console.error( replacement.from );
+                        console.error("Got:")
+                        console.error(buffer);
+                        console.error("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\r\n")
+                    } else {
+                        console.log("    |-> "+ replacement.comment );
                     }
                 }
                 await write(fileDescriptor, replacement.to, 0, replacement.to.length, replacement.offset);
@@ -132,32 +148,25 @@ class binaryFilePatcher {
      * @param {number} fileOriginalSize - The original size of the UPK file.
      */
     async decompress(filePath, fileOriginalSize) {
-        let fileInfo = fs.stat(filePath);
+
         let fileName = path.basename(filePath);
 
-        if (fileInfo.size === fileOriginalSize) {
-            await createBackup(fileName, filePath);
+        let isOriginalFile = await isSize( filePath, fileOriginalSize );
 
-            const decompressedFilePath = DECOMPRESSED_FOLDER_PATH + "/" + fileName;
-    
-            if (!fs.existsSync(decompressedFilePath)) {
-                fs.copyFile(filePath, decompressedFilePath);
-            }
-    
+        if ( isOriginalFile ) {
+
+            await createBackup(fileName, filePath, path.dirname( this.filePath) );
+
             const decompressorFilename = path.basename(UPK_DECOMPRESSOR_TOOL_PATH);
             const decompressorPath = path.dirname(UPK_DECOMPRESSOR_TOOL_PATH);
+            let decompressCommand = `${decompressorFilename} "${filePath}"`;
     
-            // Decompress
-            let decompressCommand = `${decompressorFilename} "${path.basename(decompressedFilePath)}"`;
-            exec(decompressCommand, {cwd: decompressorPath}, (error, stdout, stderr) => {
-                if (error) {
-                    console.error(`Error occurred: ${error}`);
-                    return;
-                }
+            decompressCommand = `decompress.exe "${filePath}" -out="${path.join( path.dirname(filePath), "..", "unpacked" )}"`
     
-                fs.unlinkSync(filePath);
-                fs.renameSync(decompressedFilePath, filePath);
-            });
+            await exec(decompressCommand, {cwd: decompressorPath} ).catch( err => { throw new Error("Decompression failure. Make sure to place decompress.exe next to pax+.exe", { cause: err })});
+    
+            await fs.renameSync( path.join( path.dirname(filePath), "..", "unpacked", fileName), filePath  );
+            console.log("DECOMP DONE")
         }
     }
 

@@ -1,21 +1,10 @@
 {
     "launcher": {
         "language": "English",
-        "theme": "Light",
-        "autoUpdate": true,
-        "installPath": "",
-        "autoBackup": true,
-        "backupPath": ""
+        "autoUpdate": true
     },
     "game": {
-        "resolution": "1920x1080",
-        "frameRate": 60,
-        "bloom": true,
-        "ambientOcclusion": true,
-        "motionBlur": true,
-        "fieldOfView": 90,
-        "cameraShakeLevel": "Medium",
-        "cockpitLagFactor": 1.0
+
     }
 }
   
