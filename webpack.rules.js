@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = [
   // Add support for native node modules
   {
@@ -16,6 +18,30 @@ module.exports = [
       },
     },
   },
+
+  {
+    test: /\.jsx?$/,
+    use: {
+      loader: 'babel-loader',
+      options: {
+        exclude: /node_modules/,
+        presets: ['@babel/preset-react']
+      }
+    }
+  },
+
+  {
+    test: /\.(svg|png|jpg|gif)$/,
+    include: [
+      path.resolve(__dirname, "/src/resources/img/")
+    ],
+    type: "asset/inline"
+  },
+
+  {
+    test: /\.(json)$/,
+    type: "asset/resource"
+}
   // Put your webpack loader rules in this array.  This is where you would put
   // your ts-loader configuration for instance:
   /**

@@ -1,7 +1,8 @@
+const { assert } = require('console');
 const fs = require('fs');
-
-const DEFAULT_CONFIG_PATH = '../resources/defaultConfig.json';
-
+const path = require('path');
+ 
+const DEFAULT_CONFIG_PATH = __dirname + "\\" +require('/src/resources/defaultConfig.json');//"/src/resources/defaultConfig.json";//'../resources/defaultConfig.json';
 /**
  * A class representing a configuration manager.
  */
@@ -15,8 +16,22 @@ class ConfigManager {
         this.configPath = configPath;
         this.defaultConfigPath = defaultConfigPath;
         this.config = {};
+        
+        assert( this.configPath != undefined && this.configPath != null, "[CFG_MGR]: configPath is null or undefined!" );
+        assert( this.defaultConfigPath != undefined && this.defaultConfigPath != null, "[CFG_MGR]: configPath is null or undefined!" );
+
+        // console.log( "[CFG_MGR]: configPath is "+this.config);
+        // console.log( "[CFG_MGR]: defaultConfigPath is "+this.defaultConfigPath);
 
         if (!fs.existsSync(this.configPath)) {
+
+            // Create directory for file if it doesn't exists ( copy complains otherwise )
+            let folder = path.dirname( this.configPath );
+
+            assert( this.defaultConfigPath != undefined && this.defaultConfigPath != null, "[CFG_MGR]: configPath FOLDER is null or undefined!" );
+
+            if ( !fs.existsSync( folder ) ) fs.mkdirSync( folder );
+
             // If the user configuration file does not exist, copy the default configuration.
             fs.copyFileSync(this.defaultConfigPath, this.configPath);
         }
