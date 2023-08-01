@@ -140,7 +140,7 @@ class LauncherCore {
                 source = "(INI)"
                 
                 // Load game ini & get the needed value
-                let iniLoader = new IniFilePatcher( path.join( process.env.USERPROFILE, 'Documents', 'My Games', 'Hawken-PaxPlus', 'HawkenGame', 'Config', settings[optionCategoryName][optionCfgName].ini.file+".ini") );
+                let iniLoader = new IniFilePatcher( path.join( this.iniPath, settings[optionCategoryName][optionCfgName].ini.file+".ini" ) );
                 value = iniLoader.getValue( settings[optionCategoryName][optionCfgName].ini.section, settings[optionCategoryName][optionCfgName].ini.key );
                 
             }
