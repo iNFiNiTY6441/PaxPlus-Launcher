@@ -2,7 +2,8 @@ const relativePath = "../../HawkenGame/CookedPC/Robots.u";
 const baseFileSizeInBytes = 78_019.579;
 const decompressedFileSizeInBytes = 144_748_383;
 
-const replacements = [
+const replacements = [    
+
     //Patch Version 1.5
     {
         offset: 0x005CE76D,
@@ -55,7 +56,7 @@ const replacements = [
     { offset: 0x005ADDC8, from: [0x01], to: [0x00] }, //Disable Hellfire knockback
     { offset: 0x005AE0F8, from: [0x01], to: [0x00] }, //Disable TOW knockback
     { offset: 0x005AE5C9, from: [0x01], to: [0x00] }, //Disable Seeker knockback
-    { offset: 0x005AEA4B, from: [0x01], to: [0x00] }, //Disable SAARE knockback
+    { offset: 0x005AEA5B, from: [0x01], to: [0x00] }, //Disable SAARE knockback
     { offset: 0x005AF2DE, from: [0x01], to: [0x00] }, //Disable Tri-Seeker knockback
     { offset: 0x005AF4A3, from: [0x01], to: [0x00] }, //Disable Homing Turret knockback
     { offset: 0x005AF812, from: [0x01], to: [0x00] }, //Disable Rocket Turret knockback
@@ -107,8 +108,7 @@ const replacements = [
     { offset: 0x016AA27A, from: [0x44, 0x44, 0xC4, 0x3F], to: [0x8F, 0xC2, 0x75, 0x3F] }, //Increase HeavyModeEndTime animation speed to 0.96s  
     { offset: 0x0157FB93, from: [0xCD, 0xCC, 0x4C, 0x40], to: [0xD7, 0xA3, 0x90, 0x3F] }, //Increase HeavyModeStartTime animation speed to 1.13s
     { offset: 0x017A886A, from: [0xCD, 0xCC, 0x4C, 0x40], to: [0xD7, 0xA3, 0x90, 0x3F] }, //Increase ShieldMode_FPS animation speed to 1.13s
-
-    //{ offset: 0x01882D7F, from: [0x55, 0x55, 0xD5, 0x3F], to: [0x00, 0x00, 0x80, 0x3F] }, //Increase HEAT Cannon animation to 1s    //Slightly Choppy
+    
     { offset: 0x018872A8, from: [0xDE, 0xDD, 0xAD, 0x40], to: [0x00, 0x00, 0x20, 0x40] }, //Increase Grenade Launcher animation to 2.5s
     { offset: 0x018972C0, from: [0x22, 0x22, 0x92, 0x40], to: [0x00, 0x00, 0x50, 0x40] }, //Increase Hellfires animation to 3.25s
     { offset: 0x018DCC58, from: [0xDE, 0xDD, 0xAD, 0x40], to: [0x00, 0x00, 0x20, 0x40] }, //Increase TOW animation to 2.5s  
