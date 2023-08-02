@@ -24,7 +24,7 @@ function Configure() {
 
     async function updateGamePath(event) {
 
-        let result = await LauncherCoreAPI.SelectGameDirectory();//await LauncherCoreAPI.OpenFileDialog();
+        let result = await LauncherCoreAPI.OpenFileDialog();
 
         if ( result && !result.cancelled && result.filePaths.length > 0 ) {
 
