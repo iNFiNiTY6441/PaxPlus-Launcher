@@ -15,7 +15,7 @@ const Sidemenu = () => {
 
             <div className="option" id="mainmenu_launch">
                 <div className="icon"></div>
-                <Link to="/menu/play" className="normalButton launchButton edgeDots" style={{ textDecoration: 'none' }}>LAUNCH</Link>
+                <Link to="/menu/play" className="normalButton launchButton edgeDots" style={{ textDecoration: 'none' }}>PLAY</Link>
             </div>
 
             <div className="option" id="mainmenu_GameSettings">

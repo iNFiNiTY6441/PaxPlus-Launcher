@@ -94,3 +94,4 @@ out/
 # VS Code
 .vs/
 .vscode/
+/decompress.exe
