@@ -49,6 +49,9 @@ const replacements = [
     { offset: 0x00683CB4, from: [0x34, 0x42], to: [0x20, 0x42] }, //Decrease Rocket Turret Damage to 40
     { offset: 0x006841A8, from: [0x20, 0x42], to: [0x0C, 0x42] }, //Decrease Seeker Turret Damage to 35
     { offset: 0x00687763, from: [0x5E, 0x01], to: [0xC2, 0x01] }, //Change Shield HP to 450
+    { offset: 0x00687406, from: [0xB0, 0x41], to: [0x00, 0x41] }, //Increase Shield size to 8
+    { offset: 0x006874E9, from: [0xB0, 0x41], to: [0x00, 0x41] }, //Increase Shield size to 8
+    { offset: 0x006874E9, from: [0x80, 0x40], to: [0x80, 0x3F] }, //Change Shield death contract time to 1s
 
     //DmgTypes
     { offset: 0x005AD199, from: [0x01], to: [0x00] }, //Disable HEAT Cannon knockback
@@ -79,6 +82,9 @@ const replacements = [
         from: [0x1C, 0x29, 0x25, 0x00, 0x00, 0x00, 0x71, 0x33, 0x00, 0x00, 0x16],
         to: [0x1C, 0x03, 0xFC, 0xFF, 0xFF, 0x00, 0x3B, 0x00, 0x00, 0x00, 0x16]
     }, //Change Repair Torch from super.Tick(DeltaTime); to super(Actor).Tick(DeltaTime); Hopefully allows mode switching to work correctly.
+    { offset: 0x006BB870, from: [0xC8], to: [0x4A] }, //Replace Repair Torch fire sounds with Energy Drain sounds
+    { offset: 0x006BB904, from: [0xBE], to: [0xC0] }, //Replace Repair Torch 3rd Person fire animations with SMC animations
+    { offset: 0x006BB920, from: [0xBD], to: [0xBF] }, //Replace Repair Torch 1st Person fire animations with SMC animations
     { offset: 0x006BE108, from: [0x93], to: [0x8F] }, //Replace Seeker 1st Person Model with HEAT Cannon Model
     { offset: 0x006BE0EC, from: [0x94], to: [0x90] }, //Replace Seeker 3rd Person Model with HEAT Cannon Model
     { offset: 0x006BE0D0, from: [0xB1], to: [0xB7] }, //Replace Seeker fire animation with EOC fire animation
@@ -100,6 +106,15 @@ const replacements = [
     { offset: 0x006690B7, from: [0x00, 0x00, 0xAF, 0x43], to: [0x00, 0x00, 0x2F, 0x44] }, //Increase R_Pawn ThrusterVerticalSpeed to 700
     { offset: 0x0066AD9F, from: [0x00, 0x00, 0xD2, 0x43], to: [0x00, 0x80, 0x9D, 0x44] }, //Increase R_Pawn AccelRate to 1260
     
+    { offset: 0x00656578, from: [0xE4, 0xFE, 0xFF, 0xFF, 0x38, 0x3A, 0x24, 0x01], to: [0xE1, 0x19, 0x00, 0x00, 0x38, 0x3A, 0x24, 0x0B] }, //Disables Physics check in R_Pawn.Dodge
+    { offset: 0x0059C707, from: [0x03], to: [0x0B] }, //Movestate 3 to 11 
+    { offset: 0x0059C725, from: [0x0A], to: [0x0B] }, //Movestate 10 to 11
+    { offset: 0x0059C73C, from: [0xE4, 0xFE, 0xFF, 0xFF, 0x38, 0x3A, 0x24, 0x02], to: [0xE1, 0x19, 0x00, 0x00, 0x38, 0x3A, 0x24, 0x0B] }, //Disable Physics check in R_PlayerController.PlayerWalking.ProcessMove
+    //These combined edits enable air dodging
+    //Bug with boost jumping that rapidly consumes fuel
+    //Ignoring changes at 0x0059C707 makes it more playable, but still occurs occasionally.
+    //Fixed properly with UPKUtils patch
+
     //Audio
     { offset: 0x05DEFDDC, from: [0x3F], to: [0x00] }, //Change Hellfires min SoundNodeDelay to 0 //These fix the sounds playing twice on firing the Seeker
     { offset: 0x05DEFDF8, from: [0x3F], to: [0x00] }, //Change Hellfires max SoundNodeDelay to 0 //Alternatively, could choose another firing sound.
