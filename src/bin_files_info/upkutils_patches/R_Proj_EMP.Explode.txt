@@ -1,4 +1,4 @@
-//Adds conditions for collision with Shields and Blockades, destroys on contact.
+//Adds conditions for collision with Shields and Blockades to destroy on contact.
 
 Ignoring "bad" signature: 3929117324
 Skipping 4 bytes in the headers: 1
