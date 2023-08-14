@@ -54,9 +54,9 @@ const replacements = [
     { offset: 0x00683CB4, from: [0x34, 0x42], to: [0x20, 0x42] }, //Decrease Rocket Turret Damage to 40
     { offset: 0x006841A8, from: [0x20, 0x42], to: [0x0C, 0x42] }, //Decrease Seeker Turret Damage to 35
     { offset: 0x00687763, from: [0x5E, 0x01], to: [0xC2, 0x01] }, //Change Shield HP to 450
-    { offset: 0x00687406, from: [0xB0, 0x41], to: [0x00, 0x41] }, //Increase Shield size to 8
-    { offset: 0x006874E9, from: [0xB0, 0x41], to: [0x00, 0x41] }, //Increase Shield size to 8
-    { offset: 0x006874E9, from: [0x80, 0x40], to: [0x80, 0x3F] }, //Change Shield death contract time to 1s
+    { offset: 0x00687406, from: [0xB0, 0x40], to: [0x00, 0x41] }, //Increase Shield size to 8
+    { offset: 0x006874E9, from: [0xB0, 0x40], to: [0x00, 0x41] }, //Increase Shield size to 8
+    { offset: 0x006877B9, from: [0x80, 0x40], to: [0x80, 0x3F] }, //Change Shield death contract time to 1s
 
     //DmgTypes
     { offset: 0x005AD199, from: [0x01], to: [0x00] }, //Disable HEAT Cannon knockback
