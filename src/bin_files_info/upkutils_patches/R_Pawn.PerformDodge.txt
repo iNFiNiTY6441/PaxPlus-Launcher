@@ -1,6 +1,6 @@
 //Component to enabling air dodges.
 //Adds check to if(DoubleClickMove == 3) for movestates 3 & 10, prevents massive fuel burn while flying or falling and holding boost.
-//Adds check to if(DoubleClickMove == 1) and if(DoubleClickMove == 2) for movestates 3 & 10. If flying or falling, dodges use 2 fuel. Else, dodges use ThrusterBoostSideEnergy, set to 0 in R_Mechs.ini
+//Adds check to if(DoubleClickMove == 1) and if(DoubleClickMove == 2) for movestates 3 & 10. If flying or falling, dodges use 1 fuel. Else, dodges use ThrusterBoostSideEnergy, set to 0 in R_Mechs.ini
 
 Ignoring "bad" signature: 3929117324
 Skipping 4 bytes in the headers: 1
