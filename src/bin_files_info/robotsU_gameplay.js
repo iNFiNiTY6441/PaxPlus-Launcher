@@ -92,6 +92,7 @@ const replacements = [
     { offset: 0x006BB920, from: [0xBD], to: [0xBF] }, //Replace Repair Torch 1st Person fire animations with SMC animations
     { offset: 0x006BE108, from: [0x93], to: [0x8F] }, //Replace Seeker 1st Person Model with HEAT Cannon Model
     { offset: 0x006BE0EC, from: [0x94], to: [0x90] }, //Replace Seeker 3rd Person Model with HEAT Cannon Model
+    { offset: 0x006BE192, from: [0x50, 0x42, 0x00, 0x00, 0xA0, 0xC1], to: [0xA0, 0x42, 0x00, 0x00, 0x20, 0xC2] }, //Adjust Seeker projectile spawn location
     { offset: 0x006BE0D0, from: [0xB1], to: [0xB7] }, //Replace Seeker fire animation with EOC fire animation
     { offset: 0x006BEB9D, from: [0x64], to: [0x4B] }, //Replace Slug Rifle recoil animation with SA-Hawkins
     { offset: 0x006BFFBC, from: [0x67], to: [0x4B] }, //Replace Sabot Rifle recoil animation with SA-Hawkins

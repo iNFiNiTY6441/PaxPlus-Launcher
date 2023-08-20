@@ -1,4 +1,5 @@
 //Apply self heal effect to Technician while tethered.
+//Caps repair at maximum health value.
 
 Ignoring "bad" signature: 3929117324
 Skipping 4 bytes in the headers: 1
@@ -19,8 +20,17 @@ OBJECT = R_Weap_RepairTorch.UpdateBeamEffects : AUTO
 /*(0x00D6/0x0092)*/ 		06 [@label_0x015B] 
 /*(0x00D9/0x0095)*/ 	[#label_0x00D9]
 /*(0x00D9/0x0095)*/ 	19 1A 00 <.I> 01 <@BeamComp> [@] <NullRef> 00 ( 1C <Engine.ParticleSystemComponent.SetColorParameter> 21 <Color> 1C <Core.Object.MakeColor> 24 00 24 FF 24 9B 24 FF 16 16 ) 
-/*(0x011D/0x00C5)*/ 	B8 19 1A 00 <.I> 01 <@TouchingPawns> [@] <Engine.Pawn.Health> 00 ( 01 <Engine.Pawn.Health> ) AB 00 <.DeltaTime> 01 <@HealPerSecond> 16 16 
+/*(0x011D/0x00C5)*/ 	B8 19 1A 00 <.I> 01 <@TouchingPawns> [@] <Engine.Pawn.Health> 00 ( 01 <Engine.Pawn.Health> ) AB 00 <.DeltaTime> 01 <@HealPerSecond> 16 16 			
 			B8 19 01 <Engine.Actor.Instigator> [@] <Engine.Pawn.Health> 00 ( 01 <Engine.Pawn.Health> ) AB 00 <.DeltaTime> 1E <%f 15> 16 16
+
+07 [@label_0x00DA] B1 19 01 <Engine.Actor.Instigator> [@] <Engine.Pawn.Health> 00 ( 01 <Engine.Pawn.Health> ) 19 01 <Engine.Actor.Instigator> [@] <Engine.Pawn.HealthMax> 00 ( 01 <Engine.Pawn.HealthMax> ) 16 
+			0F 19 01 <Engine.Actor.Instigator> [@] <Engine.Pawn.Health> 00 ( 01 <Engine.Pawn.Health> ) 19 01 <Engine.Actor.Instigator> [@] <Engine.Pawn.HealthMax> 00 ( 01 <Engine.Pawn.HealthMax> )
+[#label_0x00DA]
+
+07 [@label_0x00E0] B1 19 1A 00 <.I> 01 <@TouchingPawns> [@] <Engine.Pawn.Health> 00 ( 01 <Engine.Pawn.Health> ) 19 1A 00 <.I> 01 <@TouchingPawns> [@] <Engine.Pawn.HealthMax> 00 ( 01 <Engine.Pawn.HealthMax> ) 16 
+			0F 19 1A 00 <.I> 01 <@TouchingPawns> [@] <Engine.Pawn.Health> 00 ( 01 <Engine.Pawn.Health> ) 19 1A 00 <.I> 01 <@TouchingPawns> [@] <Engine.Pawn.HealthMax> 00 ( 01 <Engine.Pawn.HealthMax> )
+[#label_0x00E0]
+
 /*(0x015B/0x00EB)*/ 	[#label_0x015B]
 /*(0x015B/0x00EB)*/ 	07 [@label_0x01F7] 72 1A 00 <.I> 01 <@BeamComp> 2A 16 
 /*(0x0174/0x00FC)*/ 		0F 1A 00 <.I> 01 <@BeamComp> 19 19 01 <Engine.Actor.WorldInfo> [@] <Engine.WorldInfo.MyEmitterPool> 00 ( 01 <Engine.WorldInfo.MyEmitterPool> ) [@] <Engine.EmitterPool.SpawnEmitter.ReturnValue> 00 ( 1B <SpawnEmitter> 01 <@BeamPickupEffect> D7 19 01 <Engine.Actor.Instigator> [@] <Engine.Actor.Location> 00 ( 01 <Engine.Actor.Location> ) 23 <%f 100> <%f 0> <%f 0> 16 4A 4A 4A 4A 4A 16 ) 
