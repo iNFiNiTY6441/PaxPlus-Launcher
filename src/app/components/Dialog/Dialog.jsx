@@ -13,7 +13,7 @@ const Dialog = ({children, dialogTitle, rightButtonName, rightButtonFunction, ri
                 <h1 className="edgeDots"> { dialogTitle } </h1>
 
                 <p>
-                    <main>{children}</main>
+                    {children}
                 </p>
 
                 <div className="buttonContainer" style={{display:  rightButtonName ? "block" : "none" }}>

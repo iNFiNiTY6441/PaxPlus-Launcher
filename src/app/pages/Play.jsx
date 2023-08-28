@@ -1,152 +1,135 @@
 import React from 'react'; 
 
-import { useEffect, useState } from 'react';
+import ServerList from '../components/ServerList/ServerList.jsx';
 
+import { useEffect, useState, useRef } from 'react';
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function Play() {
 
-    const [serverData, setServerData] = useState({});
-    const [serverError, setServerError] = useState(null);
+    const [ tab, setTab ] = useState(0);
 
-    async function fetchServers() {
+    const pagetab_singleplayer = useRef(null);
+    const pagetab_servers = useRef(null);
 
-        try {
-            let servers = await LauncherCoreAPI.GetServers();
-            setServerData(servers);
-        } catch ( serverFetchError ) {
+    const [isOffline, setIsOffline] = useState(true);
 
-            setServerError( serverFetchError.message );
+    const navigate = useNavigate();
+
+    function setTab_singleplayer(){
+        pagetab_singleplayer.current.classList.remove("inactive");
+        pagetab_servers.current.classList.add("inactive");
+        setTab(1);
+    }
+
+    function setTab_servers(){
+        pagetab_servers.current.classList.remove("inactive");
+        pagetab_singleplayer.current.classList.add("inactive");
+        setTab(0);
+    }
+
+    async function launchgame(){
+
+
+    }
+
+    async function initialize() {
+
+        let offline = await LauncherCoreAPI.isEOL()
+
+        setIsOffline(offline)
+        
+        if ( offline == true ) {
+
+            pagetab_servers.current.classList.add("disabled"); 
+            setTab_singleplayer();
+            
+        } else {
+            setTab_servers();
         }
-
     }
 
     useEffect(() => {
         
-        fetchServers();
-
+        
+        initialize();
     }, []);
     
     return (         
 
-        <div className="UIPage" id="page_goptions" style={{ display: "block", width: "800px", border: "none"}} >
+        <div className="UIPage" id="page_goptions" tabIndex="-1" style={{ display: "block", width: "780px", border: "none"}} >
         
-            <div className="pagewindow" style={{width: "797px"}}>
 
-                <div style={{ display: "flex", width: "900px", marginBottom: "2px" }}>
-                    {/* <h2 className="pageCategory edgeDots" style={{ width: "793px", height: "40px", marginLeft: "1px", justifyContent: "center"}}>
-                       Multiplayer
-                    </h2> */}
+        <div className="pagewindow" style={{width: "778px"}}>
 
-                    {/* <h2 className="pageCategory edgeDots" style={{ width: "780px", height: "78px", marginLeft: "1px", justifyContent: "center"}}>
-                        JOIN <br/> Servers
-                    </h2> */}
+            <div style={{ display: "flex", width: "778px", marginBottom: "2px" }}>
 
-                    {/* <h2 className="pageCategory edgeDots" style={{ height: "78px", marginLeft: "1px", justifyContent: "center", paddingLeft: "0px"}}>
-                        OFFLINE
-                    </h2> */}
+                <h2 className="pageCategory edgeDots" ref={pagetab_singleplayer} onClick={()=>setTab_singleplayer()}>
+                    Standalone
+                </h2>
 
-                    <h2 className="pageCategory edgeDots" style={{ width: "400px", height: "40px", marginLeft: "1px", marginRight:"1px", justifyContent: "center", letterSpacing: "0.5px"}}>
-                       Join servers
-                    </h2>
+                <h2 className="pageCategory edgeDots inactive" ref={pagetab_servers} onClick={()=>setTab_servers()}>
+                    Server list
+                </h2>
+                
+            </div>  
 
-                    <h2 className="pageCategory edgeDots" style={{ width: "400px", height: "40px", marginLeft: "1px", marginRight:"1px", justifyContent: "center", letterSpacing: "0.5px", opacity: 0.55}}>
-                       Singleplayer
-                    </h2>
+            { isOffline == false && tab == 0 && 
+            
+                <ServerList offline={isOffline}></ServerList>
+            
+             }
+
+            { tab == 1 && 
+
+                <>
+                <div className="pagewindow blockerLines" style={{height:"10px"}}/>
+                <div style={{border: "solid 1px #555C5E", padding:"2px", margin:"1px", width: "778px", height: "384px", fontSize:"18px"}}>
+                <br/>
+                    <h3>/// Launching standalone</h3>
+
+                    <p style={{ color: "#bacecf", fontSize: "16.5px", lineHeight:"25px", marginTop: "14px", marginLeft:"20px"}}>
+                    Launches the game without directly joining a server.<br/><br/>
+                    </p>
+
+                    <h3>/// Opening the in-game console</h3>
                     
-                </div>  
+                    <p style={{ color: "#bacecf", fontSize: "16.5px", lineHeight:"25px", marginTop: "14px", marginLeft:"20px"}}>
+                    You can open the in-game console using the
+                    <span style={{color: "#9df2f5",backgroundColor:"#121719", borderRadius:"8px", fontSize:"20px", padding:"5px", margin:"10px", border: "solid 1px #9df2f5", opacity: 0.75}}>&nbsp;`&nbsp;</span>
+                    key.<br/><br/>
+                    </p>
 
-                {/* <table id="globalStats" style={{marginBottom: "50px", height: "36px"}}>
-                    <tbody>
-                        <tr>
-                        <td className="edgeDots"><button id="refreshButton" style={{width: "179px"}}>DISCORD</button></td>
-                            <td className="blockerLines"></td>
-                            <td className="edgeDots"><button id="refreshButton" style={{width: "179px"}}>EVENTS</button></td>
-                            <td className="blockerLines"></td>
-                            <td className="edgeDots"><button id="refreshButton" style={{width: "179px"}}>REFRESH</button></td>
-                            <td className="blockerLines"></td>
-                            <td className="edgeDots"><button id="refreshButton" style={{width: "179px"}}>HOSTING GUIDE</button></td>
-                        </tr>
-                    </tbody>
-                </table> */}
-                
-                
+                    <h3>/// Joining a server in-game</h3>
 
-    
+                    <p style={{ color: "#bacecf", fontSize: "16.5px", lineHeight:"25px", marginTop: "14px", marginLeft:"20px"}}>
+                    You are still able to connect to servers by using the following console command:
+                    </p>
 
-                <div style={{ width: "800px", height: "408px"}}>
-
-                    <table id="serverlist" style={{width: "795px", marginLeft: "1px", marginTop: "2px"}}>
-
-                        <thead>
-                            <tr>
-                                <th style={{width: "310px" }}>Name</th>
-                                <th style={{width: "200px"}}>Players</th>
-                                <th style={{width: "86px"}} >In-Game</th>
-                                <th style={{width: "122px"}}>Start</th>
-                            </tr>
-                        </thead>
-
-
-                        {
-                            serverError != null &&
-
-                            <p>
-                                {serverError}
-                            </p>
-                        }
-
-
-                        { Object.keys(serverData).map( ( serverIP ) => 
-                
-                            <tr>
-                                <td> {serverData[serverIP].name} </td>
-                                <td>{serverData[serverIP].players} / {serverData[serverIP].maxPlayers}</td>
-                                <td style={{fontSize: "16px"}}>
-                                    <button style={{ width:"90px"}}>COPY IP</button>
-                                </td>
+                    <p><span style={{color: "#9df2f5", backgroundColor:"#121719", padding:"5px", marginLeft:"20px", border: "solid 1px #555C5E", opacity: 0.75}}>&nbsp;Open &nbsp; SERVER_IP_HERE&nbsp;</span>
+                    &nbsp;&nbsp;( The correct command can be obtained from the server browser )
                     
-                                <td style={{width: "100px", fontSize: "15.5px"}}>
-                                <button style={{ width:"90px"}}>LAUNCH</button>
-                                </td>
-                            </tr>
-                            )
-                        }
-
-
-
-                        <tbody>
-
-                        </tbody>
-                        
-                    </table>
-
+                    </p>
+                  
                 </div>
 
-                <div className="pagewindow blockerLines" style={{height:"10px"}}></div>
+                <div className="pagewindow blockerLines" style={{height:"10px"}}/>
 
                 <table id="globalStats">
                     <tbody>
-                        <tr>
-                            <td className="edgeDots">PLAYERS: &nbsp;<span style={{color: "#3EC1A2"}}> 0 </span></td>
-                            <td className="blockerLines"></td>
-                            <td className="edgeDots">SERVERS: &nbsp;<span style={{color: "#3EC1A2"}}> 0 </span></td>
-                            <td className="blockerLines"></td>
-                            <td className="edgeDots" >0% CAPACITY</td>
-                            <td className="blockerLines"></td>
-                            <td className="edgeDots"><button id="refreshButton" onClick={ () => {LauncherCoreAPI.LaunchGame()} }>REFRESH</button></td>
+                        <tr style={{height:"34px"}}>                        
+                            <td className="edgeDots"><button  style={{width:"99%"}} onClick={ () => { LauncherCoreAPI.LaunchGame() } }>LAUNCH GAME</button></td>
                         </tr>
                     </tbody>
                 </table>
 
-                <div className="pagewindow blockerLines" style={{height:"10px"}}></div>
+                <div className="pagewindow blockerLines" style={{height:"10px"}}/>
 
-                {/* <div className="pagewindow">
-                <h2 className="dailogWindow blockerLines separator">&nbsp;</h2>
-                </div> */}
+                </>
+            }
 
+        </div>
 
-            </div>
-    
         </div>
     ); 
 } 

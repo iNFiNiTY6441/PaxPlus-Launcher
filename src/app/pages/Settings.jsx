@@ -10,16 +10,17 @@ function Configure() {
 
     const gamePath_InputRef = useRef(null);
 
+    const launchArgs = useRef("");
+
     async function fetchSettings() {
 
         let settings = await LauncherCoreAPI.GetGameSettingsBase();
         let gamePath = await LauncherCoreAPI.getUserConfigValue( "launcher","gamePath");
+        let args = await LauncherCoreAPI.getUserConfigValue( "launcher","gameStartupArgs");
 
-        setSettingsData( settings );
-        setGamePath( gamePath );
-
-        console.log(settings);
-        console.log(gamePath)
+        if ( settings ) setSettingsData( settings );
+        if ( gamePath ) setGamePath( gamePath );
+        if ( args ) launchArgs.current = args;
     }
 
     async function updateGamePath(event) {
@@ -42,6 +43,7 @@ function Configure() {
         fetchSettings();
         
         return () => {
+            LauncherCoreAPI.setUserConfigValue( "launcher", "gameStartupArgs", launchArgs.current );
             LauncherCoreAPI.SaveGameSettings();
         }
 
@@ -70,6 +72,14 @@ function Configure() {
                                 <td className="edgeDots" style={{ width: "30px", fontSize: "15px"}}>
                                 <button type="file" id="gamepath_button" onClick={ updateGamePath }>Select</button>
                                 <input type="file" id="gamepath_input" ref={gamePath_InputRef} onChange={updateGamePath} hidden/>
+                                </td>
+                            </tr>
+
+
+                            <tr>
+                                <td className="edgeDots" style={{width: "277px", fontSize:"13px", height: "33px", textAlign: "center", padding:"0"}}>LAUNCH ARGS</td>
+                                <td colSpan="2" className="edgeDots" style={{width: "150px"}}>
+                                    <input type="text" id="favcolor" name="favcolor" spellCheck="false" defaultValue={launchArgs.current} onInput={ ()=> {launchArgs.current = event.target.value} } style={{position:"absolute", color:"#81c0c4", paddingLeft:"15px", top:"3px",left:"3px",width:"95.6%"}} />
                                 </td>
                             </tr>
                             

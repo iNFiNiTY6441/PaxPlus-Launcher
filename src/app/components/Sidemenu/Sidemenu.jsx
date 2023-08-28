@@ -15,31 +15,31 @@ const Sidemenu = () => {
 
             <div className="option" id="mainmenu_launch">
                 <div className="icon"></div>
-                <Link to="/menu/play" className="normalButton launchButton edgeDots" style={{ textDecoration: 'none' }}>PLAY</Link>
+                <Link to="/menu/play" className="normalButton launchButton edgeDots" style={{ textDecoration: 'none' }} tabIndex="-1">PLAY</Link>
             </div>
 
             <div className="option" id="mainmenu_GameSettings">
 
                 <div className="icon"></div>
-                <Link to="/menu/config" className="normalButton edgeDots" style={{ textDecoration: 'none' }}>SETTINGS</Link>
+                <Link to="/menu/config" className="normalButton edgeDots" style={{ textDecoration: 'none' }} tabIndex="-1">SETTINGS</Link>
             </div>
 
-            <div className="option" id="mainmenu_GameSettings">
+            {/* <div className="option" id="mainmenu_GameSettings">
 
             <div className="icon"></div>
-            <Link to="/welcome" className="normalButton edgeDots" style={{ textDecoration: 'none' }}><span style={{color:"#dcdf5e", marginRight:"5px",fontSize:"10px"}}>[DEV]</span> DIALOG TEST</Link>
-            </div>
+            <Link to="/welcome" className="normalButton edgeDots" style={{ textDecoration: 'none' }} tabIndex="-1"><span style={{color:"#dcdf5e", marginRight:"5px",fontSize:"10px"}}>[DEV]</span> DIALOG TEST</Link>
+            </div> */}
 
             <div className="option" id="mainmenu_Legal">
                 
                 <div className="icon"></div>
-                <Link to="/menu/about" className="normalButton edgeDots" style={{ textDecoration: 'none' }}>Legal</Link>
+                <Link to="/menu/about" className="normalButton edgeDots" style={{ textDecoration: 'none' }} tabIndex="-1">Legal</Link>
             </div>
 
             <div className="option" id="mainmenu_Exit">
                 
                 <div className="icon"></div>
-                <div className="normalButton edgeDots" onClick={ function(){window.close()}}>Exit</div>
+                <div className="normalButton edgeDots" onClick={ function(){window.close()}} tabIndex="-1">Exit</div>
             </div>
 
         </div>

@@ -9,6 +9,30 @@ const { ipcRenderer, contextBridge, remote } = require('electron');
 // });
 
 contextBridge.exposeInMainWorld('LauncherCoreAPI', {
+
+  isEOL( ) {
+    return ipcRenderer.invoke('Core:IsEOL');
+  },
+
+  getNews(){
+    return ipcRenderer.invoke('Core:GetNews');
+  },
+
+  getPatchVersion(){
+    return ipcRenderer.invoke('Core:GetPatchVersion');
+  },
+
+  finishSetup(){
+    return ipcRenderer.invoke('Core:finishSetup');
+  },
+
+  getNetmode( ) {
+    return ipcRenderer.invoke('Core:GetNetmode');
+  },
+
+  isGameRunning(){
+    return ipcRenderer.invoke('Core:IsGameRunning');
+  },
   
   OpenFileDialog( title, basepath ) {
     return ipcRenderer.invoke('Core:OpenFileDialog', title, basepath );
@@ -22,8 +46,9 @@ contextBridge.exposeInMainWorld('LauncherCoreAPI', {
     ipcRenderer.send('Core:ShowPage', page, queryParams );
   },
 
-  LaunchGame() {
-    ipcRenderer.send('Core:LaunchGame', { "Testdata":"foobar"});
+  LaunchGame( serverIP ) {
+    //ipcRenderer.send('Core:LaunchGame', { "Testdata":"foobar"});
+    return ipcRenderer.invoke('Core:LaunchGame', serverIP );
   },
 
   GetServers() {

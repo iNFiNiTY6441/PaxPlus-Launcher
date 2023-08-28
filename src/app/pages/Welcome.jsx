@@ -47,8 +47,8 @@ function Welcome() {
     }
 
     function finishSetup(){
-
-        navigate("/menu");
+        LauncherCoreAPI.finishSetup();
+        //navigate("/menu");
     }
 
     return (
@@ -88,7 +88,7 @@ function Welcome() {
 
                             <td style={{width: "435px", textAlign: "left", paddingLeft: "20px", fontSize: "13px"}}> { gamePath } </td>
 
-                            <td class="edgeDots" style={{width: "90px", fontSize: "15px"}}>
+                            <td className="edgeDots" style={{width: "90px", fontSize: "15px"}}>
                                 <button type="file" id="btn_exeFile" onClick={updateGamePath}>Select</button>
                                 <input type="file" id="input_exeFile"hidden/>
                             </td>
@@ -107,7 +107,7 @@ function Welcome() {
                 page == 2 && 
                 
                 <Dialog dialogTitle="READY" rightButtonName="ACKNOWLEDGE" rightButtonFunction={finishSetup}>
-
+                    
                     <span style={{color: "#9df2f5"}}>Great, you're all set up.</span>
                     <br/><br/>
                     &gt; The game will update automatically as <br/>new patches become available.
@@ -117,6 +117,7 @@ function Welcome() {
                     <span style={{color: "#dcdf5e"}}>Enjoy & good luck out there, Pilot.</span>
                 </Dialog>
             }
+            
         </div>
 
     ); 

@@ -17,7 +17,7 @@ const createWindow = async () => {
     width: 1200,
     height: 720,
     webPreferences: {
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
     },
     resizable: false,
   });
@@ -29,8 +29,11 @@ const createWindow = async () => {
 
   // OPEN ALL EXTERNAL HREF LINKS IN DEFAULT BROWSER INSTEAD OF THE ELECTRON APP
   var handleRedirect = (e, url) => {
+
+    e.preventDefault();
+
     if(url != mainWindow.webContents.getURL()) {
-      e.preventDefault()
+      
       require('electron').shell.openExternal(url)
     }
   }
@@ -38,11 +41,16 @@ const createWindow = async () => {
   mainWindow.webContents.on('will-navigate', handleRedirect)
   mainWindow.webContents.on('new-window', handleRedirect)
 
+  mainWindow.webContents.setWindowOpenHandler(() => {
+    return { action: "deny" };
+  });
+  
+
   LAUNCHER_CORE = new LauncherCore( remoteDataEndpoint, mainWindow );
   LAUNCHER_CORE.showPage( "loading", { progress: 0.0, loadingText: "Starting core functions." } );
-  LAUNCHER_CORE.initialize().catch(error => {
+  LAUNCHER_CORE.init_0().catch(error => {
     console.log(error)
-    LAUNCHER_CORE.showPage( "critical", { errorHeading: "FATAL INIT ERROR", errorMessage: "Contact support or reinstall launcher." } );
+    LAUNCHER_CORE.showPage( "critical", { errorHeading: "FATAL INIT ERROR", errorMessage: "Contact support or reinstall launcher.\r\n"+error.message } );
   });
 };
 

@@ -31,13 +31,20 @@
     "style-loader": "^3.3.3"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^1.9.5",
     "axios": "^1.4.0",
     "dgram": "^1.0.1",
     "electron-squirrel-startup": "^1.0.0",
     "ini": "^4.1.1",
+    "js-ini": "^1.6.0",
+    "multi-ini": "^2.3.2",
     "punt": "^2.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.14.1"
+    "react-markdown": "^8.0.7",
+    "react-redux": "^8.1.2",
+    "react-router-dom": "^6.14.1",
+    "react-tracked": "^1.7.11",
+    "winattr": "^3.0.0"
   }
 }

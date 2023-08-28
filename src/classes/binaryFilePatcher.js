@@ -59,7 +59,6 @@ class binaryFilePatcher {
      * @async
      */
     async init() {
-        console.log("INIT!!")
         this.baseData = open(this.filePath, 'r+');
     }
 
@@ -117,6 +116,7 @@ class binaryFilePatcher {
                         console.error("\r\n=-=-=-=-=-=-=-=- BINARY PATCH ERROR =-=-=-=-=-=-=-=-")
                         console.error(`Replacement mismatch for '${path.basename(this.filePath)}'`);
                         if(replacement.comment) console.error( "("+replacement.comment+")\r\n" )
+                        console.log("Address: "+replacement.offset)
                         console.error("Expected:");
                         console.error( replacement.from );
                         console.error("Got:")

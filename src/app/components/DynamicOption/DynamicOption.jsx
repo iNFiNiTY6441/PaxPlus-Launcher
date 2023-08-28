@@ -5,12 +5,14 @@ import { useEffect, useState } from 'react';
 
 const DynamicOption = ( { optionsSection, optionsKey, optionsData }) => {
 
-    console.log(optionsData);
+    //console.log(optionsData);
 
     const [ optionValue, setOptionValue ] = useState("");
 
     async function getSetttingValue() {
         let val = await LauncherCoreAPI.GetGameSetting( optionsSection, optionsKey );
+
+        if ( !val ) val = "ERROR";
         setOptionValue( val );
     }
 
@@ -28,8 +30,6 @@ const DynamicOption = ( { optionsSection, optionsKey, optionsData }) => {
                 value = event.target.checked ? 'True' : 'False';
                 break;
         }
-
-        console.log(value)
         await LauncherCoreAPI.SetGameSetting( optionsKey, value );
         setOptionValue( value );
     }
@@ -46,11 +46,11 @@ const DynamicOption = ( { optionsSection, optionsKey, optionsData }) => {
     if ( optionsData.type == "slider" ) return (
 
         <tr>
-            <td style={{width: "300px"}}>{optionsData.name}</td>
+            <td style={{width: "310px"}}>{optionsData.name}</td>
             <td colSpan="2" style={{ textAlign: "left"}}>
 
-                <div className="sliderLabel" id="{optionsData.name}_label" htmlFor="gfx_fpsCap">{optionValue}</div>
-                <input type="range" min={optionsData.min} max={optionsData.max} value={ optionValue } step={optionsData.step} className="slider" onChange={ inputUpdate } id="gfx_fpsCap" style={{ left: "130px"}}/>
+                <div className="sliderLabel" id="{optionsData.name}_label" htmlFor="gfx_fpsCap" style={{ left: "4px"}} >{optionValue}</div>
+                <input type="range" min={optionsData.min} max={optionsData.max} value={ optionValue } step={optionsData.step} className="slider" onChange={ inputUpdate } id="gfx_fpsCap" style={{ left: "128px"}}/>
             
             </td>
         </tr>
@@ -83,9 +83,33 @@ const DynamicOption = ( { optionsSection, optionsKey, optionsData }) => {
             <td className="edgeDots" style={{width: "277px"}}>{optionsData.name}</td>
             <td className="edgeDots" style={{width: "150px"}}>
             <label className="container">
-                <input type="checkbox" checked={ optionValue.toLowerCase() === "true" } onChange={ inputUpdate } />
+                <input type="checkbox" checked={ optionValue.toString().toLowerCase() === "true" } onChange={ inputUpdate } />
                 <span className="checkmark"></span>
             </label>
+            </td>
+            <td className="blockerLines" style={{width: "170px"}}></td>
+        </tr>
+
+    );
+
+    if ( optionsData.type == "color" ) return (
+
+        <tr>
+            <td className="edgeDots" style={{width: "277px"}}>{optionsData.name}</td>
+            <td className="edgeDots" style={{width: "150px"}}>
+                <input type="color" id="favcolor" name="favcolor" value={""+optionValue+""} onChange={ inputUpdate } style={{position:"absolute", top:"3px",left:"3px", width:"198px"}} />
+            </td>
+            <td className="blockerLines" style={{width: "170px"}}></td>
+        </tr>
+
+    );
+
+    if ( optionsData.type == "text" ) return (
+
+        <tr>
+            <td className="edgeDots" style={{width: "277px"}}>{optionsData.name}</td>
+            <td className="edgeDots" style={{width: "150px"}}>
+                <input type="text" id="favcolor" name="favcolor" value={""+optionValue+""} onChange={ inputUpdate } style={{position:"absolute", top:"3px",left:"3px",width:"186px"}} />
             </td>
             <td className="blockerLines" style={{width: "170px"}}></td>
         </tr>
@@ -95,7 +119,7 @@ const DynamicOption = ( { optionsSection, optionsKey, optionsData }) => {
     return ( 
 
         <tr>
-            <td style={{width: "240px"}}>SHIT{optionsData.name}</td>
+            <td style={{width: "240px"}}>ERROR: {optionsData.name}</td>
         </tr>
     );
     

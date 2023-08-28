@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useMemo, useContext } from "react";
 import Layout from "./components/Layout/Layout.jsx";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import Legal from "./pages/Legal.jsx";
@@ -35,8 +35,8 @@ function App() {
 
             </Routes>      
 
-        </HashRouter> 
+        </HashRouter>   
   );
 }
 
-export default App;
+ export default App;

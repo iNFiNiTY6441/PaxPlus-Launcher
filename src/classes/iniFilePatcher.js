@@ -1,9 +1,89 @@
 const fs = require('fs');
-const ini = require('ini');
 const path = require('path');
+const winattr = require('winattr');
 
 const DOCUMENTS_BASE_PATH = path.join(process.env.USERPROFILE, 'Documents');
 const INI_CONFIGS_PATH = path.join(DOCUMENTS_BASE_PATH, 'My Games', 'Hawken', 'HawkenGame', 'Config');
+
+/**
+ * Custom ini parsing implementation, not the shortest but the safest, going line by line.
+ * Supports reading duplicate ini keys as arrays.
+ * Does not support creating nested keys in the parsed object.
+ * 
+ * @param {String} iniText The ini text to parse
+ * @returns {Object} The parsed ini data as an object
+ */
+function custom_parse( iniText ) {
+
+    let iniObject = {};
+
+    let lines = iniText.split("\r\n");
+    let currentSection = '';
+
+    for ( let line of lines ) {
+
+        let sectionMatch = line.match(/\[.*\]$/gm);
+        if ( sectionMatch ) {
+            currentSection = sectionMatch[0].slice(1,-1);
+            iniObject[currentSection] = {};
+            continue;
+        }
+
+        let key = line.match(/^[^=]*/g);
+        let value = line.match(/\=(.*)/g);
+
+        if ( !key || !value ) continue;
+
+        key = key[0].trim();
+        value = value[0].trim().slice(1);
+
+        if ( Object.keys(iniObject[currentSection]).indexOf( key ) == -1 ) {
+            iniObject[currentSection][key] = value;
+            continue;
+        }
+
+        if (iniObject[currentSection][key].constructor === Array) {
+            iniObject[currentSection][key].push( value ); 
+            continue;
+        } 
+        
+        iniObject[currentSection][key] = [ iniObject[currentSection][key], value ] //array   
+    }
+
+    return iniObject;
+}
+/**
+ * Custom ini object stringify implementation.
+ * Writes arrays as multiple sequential occurrences of the same key.
+ * @param {Object} iniObject The parsed ini object to stringify
+ * @returns {String} The ini text
+ */
+function custom_stringify( iniObject ) {
+
+    let iniLines = [];
+
+    for ( let section in iniObject ) {
+
+        iniLines.push(`[${section}]`);
+
+        for ( let key in iniObject[section] ) {
+
+            if ( iniObject[section][key].constructor === Array ) {
+
+                for ( let i=0; i < iniObject[section][key].length; i++ ) {
+                    iniLines.push(`${key}=${iniObject[section][key][i]}`);
+                }
+
+            } else {
+                iniLines.push(`${key}=${iniObject[section][key]}`);
+            }
+        }
+
+        iniLines.push("");
+    }
+    
+    return iniLines.join("\r\n");
+}
 
 /**
  * A class for patching INI files.
@@ -39,15 +119,24 @@ class IniFilePatcher {
      */
     loadConfig() {
         const iniString = fs.readFileSync(this.filePath, 'utf-8');
-        return ini.parse(iniString);
+        return custom_parse(iniString);
     }
 
     /**
      * Saves the current configuration to the INI file.
      */
     saveConfig() {
-        const iniString = ini.stringify(this.config);
+
+        let iniString = custom_stringify(this.config);
+
+        // Windows Read-only: Unlock the file before writing
+        winattr.setSync( this.filePath, {readonly:false});
+
+        // Write ini text to file
         fs.writeFileSync(this.filePath, iniString);
+
+        // Windows Read-only: Lock the file to prevent the game from being stingy about it
+        winattr.setSync( this.filePath, {readonly:true});
     }
 
     /**
@@ -57,17 +146,8 @@ class IniFilePatcher {
      * @returns {*} - The value of the key in the section of the INI file.
      */
     getValue(section, key) {
-        const sectionParts = section.split('.');
-        let currentSection = this.config;
 
-        for (const sectionPart of sectionParts) {
-            if (!currentSection[sectionPart]) {
-                return undefined;
-            }
-            currentSection = currentSection[sectionPart];
-        }
-
-        return currentSection[key];
+        return this.config[section][key];
     }
 
     /**
@@ -77,17 +157,8 @@ class IniFilePatcher {
      * @param {*} value - The value to set for the key in the section of the INI file.
      */
     setValue(section, key, value) {
-        const sectionParts = section.split('.');
-        let currentSection = this.config;
-
-        for (const sectionPart of sectionParts) {
-            if (!currentSection[sectionPart]) {
-                currentSection[sectionPart] = {};
-            }
-            currentSection = currentSection[sectionPart];
-        }
-
-        currentSection[key] = value;
+        this.config[section][key] = value;
+        return
     }
 
     /**
@@ -97,22 +168,8 @@ class IniFilePatcher {
      * @returns {boolean} - Whether the key was successfully deleted.
      */
     deleteValue(section, key) {
-        const sectionParts = section.split('.');
-        let currentSection = this.config;
-
-        for (const sectionPart of sectionParts) {
-            if (!currentSection[sectionPart]) {
-                return false;
-            }
-            currentSection = currentSection[sectionPart];
-        }
-
-        if (currentSection.hasOwnProperty(key)) {
-            delete currentSection[key];
-            return true;
-        }
-
-        return false;
+        delete this.config[section][key];
+        return;
     }
 }
 
