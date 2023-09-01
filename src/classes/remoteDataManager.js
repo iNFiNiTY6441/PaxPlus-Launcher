@@ -89,8 +89,16 @@ class RemoteDataManager {
         if ( !fs.existsSync( this.localPath ) ) throw new Error("No local copy of remote file!");
         
         let rawData = fs.readFileSync( this.localPath );
-        this.data = JSON.parse( rawData );
+        let parsedData = JSON.parse( rawData );
+
+        if ( JSON.stringify(this.data) === rawData ) return;
+
         this.dataSource = 'local';
+        this.data = parsedData;
+
+        // Call update handler if available
+        console.log(this.onChangedCallback)
+        if ( this.onChangedCallback ) this.onChangedCallback( parsedData );   
     }
 
     /**
@@ -106,17 +114,19 @@ class RemoteDataManager {
 
         });
         
-        if ( this.data === response.data ) return;
+        if ( JSON.stringify(this.data) === JSON.stringify(response.data) ) return;
 
-        // Call update handler if available
-        if ( this.onChangedCallback ) this.onChangedCallback( response.data );
+        this.dataSource = 'remote';
+
+        // Update in memory copy
+        this.data = response.data;
 
         // Write to local file, if requested
         if ( this.localPath ) fs.writeFileSync( this.localPath + "\\", JSON.stringify( response.data , null, 2 ) );
 
-        // Update in memory copy
-        this.data = response.data;
-        this.dataSource = 'remote';
+        // Call update handler if available
+        console.log(this.onChangedCallback)
+        if ( this.onChangedCallback ) this.onChangedCallback( response.data );
     }
 }
 

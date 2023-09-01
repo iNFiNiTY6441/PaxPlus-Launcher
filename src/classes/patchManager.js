@@ -101,7 +101,15 @@ class PatchManager {
         let exePath = path.join(this.gamePath,"Binaries","Win32" ,"HawkenGame-Win32-Shipping.exe");
 
         let command = `${exePath} ${parameters.join(" ")}`
-        exec(command, function(err, stdout, stderr) {});
+
+        return new Promise( function( resolve, reject ) {
+
+            let gameRun = exec(command, function(err, stdout, stderr) {});
+
+            gameRun.on('error', reject )
+            gameRun.on('exit', resolve );
+        })
+
     }
 
     /**
@@ -144,7 +152,7 @@ class PatchManager {
             // Skip patching files that already have the correct hashes
             if ( filePath ) {
 
-                let fileHashPatched = this.patchConfig.meta.targetHashes[patchOperation.filePath]
+                let fileHashPatched = this.patchConfig.meta.targetHashes[patchOperation.filePath].toLowerCase()
                 let fileHashActual = await getHash( filePath );
 
                 if ( fileHashPatched === fileHashActual ) {
@@ -172,6 +180,10 @@ class PatchManager {
 
                     // Change path for patching default inis
                     if ( patchOperation.file.startsWith("Default") ) filePath = path.join( this.gamePath, "HawkenGame", "Config", patchOperation.file );
+
+                    // Change path for localisation files
+                    if ( patchOperation.file.endsWith(".int") ) filePath = path.join( this.gamePath, "HawkenGame", "Localization", "INT", patchOperation.file );
+
                     await this.patchIniFile( filePath, patchOperation.actions );
                     break;
 
@@ -368,16 +380,27 @@ class PatchManager {
         }
      
         // File missing? Let's try the backup
-        if ( !fs.existsSync( filePath ) ) await restoreBackup( filePath );
+
+        if ( !fs.existsSync( filePath ) ) {
+            
+            let backupPath = filePath+".backup";
+            if ( !fs.existsSync( backupPath ) ) throw new Error(path.basename(filePath)+" not found.",{code:"ENOENT"});
+
+            await restoreBackup( filePath );
+        }
+        
 
         let fileHash = await getHash( filePath );
-        console.log(fileHash)
-        if ( fileHash === patchOperationData.patchAppliedHash ) {
+
+        if ( fileHash === patchOperationData.patchAppliedHash.toLowerCase() ) {
             console.log( "[UPK]["+path.basename( filePath )+"] SKIP (Already patched)");
             return;
-        }
-        if ( fileHash != patchOperationData.requiredHash ) {
+        } 
+
+        if ( fileHash != patchOperationData.requiredHash.toLowerCase() ) {
             console.log( "[UPK]["+path.basename( filePath )+"] RESTORE (Not baseline)");
+            let backupPath = filePath+".backup";
+            if ( !fs.existsSync( backupPath ) ) throw new Error("A vanilla version of the PAX Client is required for first time patching. Please redownload / change directory to an unmodified client. ( No backupfile found )", {code:"EHASH"});
             await restoreBackup( filePath );
         }
         

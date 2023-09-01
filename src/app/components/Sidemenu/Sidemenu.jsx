@@ -1,11 +1,10 @@
 import React from 'react';
-import { BrowserRouter, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 /**
  * Main menu UI sidebar, containing all the launcher options
  */
 const Sidemenu = () => {
-
 
     return (
 
@@ -19,25 +18,21 @@ const Sidemenu = () => {
             </div>
 
             <div className="option" id="mainmenu_GameSettings">
-
                 <div className="icon"></div>
                 <Link to="/menu/config" className="normalButton edgeDots" style={{ textDecoration: 'none' }} tabIndex="-1">SETTINGS</Link>
             </div>
 
-            {/* <div className="option" id="mainmenu_GameSettings">
-
-            <div className="icon"></div>
-            <Link to="/welcome" className="normalButton edgeDots" style={{ textDecoration: 'none' }} tabIndex="-1"><span style={{color:"#dcdf5e", marginRight:"5px",fontSize:"10px"}}>[DEV]</span> DIALOG TEST</Link>
-            </div> */}
+            <div className="option" id="mainmenu_Guide">
+                <div className="icon"></div>
+                <Link to="/menu/guide" className="normalButton edgeDots" style={{ textDecoration: 'none' }} tabIndex="-1">FAQ</Link>
+            </div>
 
             <div className="option" id="mainmenu_Legal">
-                
                 <div className="icon"></div>
                 <Link to="/menu/about" className="normalButton edgeDots" style={{ textDecoration: 'none' }} tabIndex="-1">Legal</Link>
             </div>
 
             <div className="option" id="mainmenu_Exit">
-                
                 <div className="icon"></div>
                 <div className="normalButton edgeDots" onClick={ function(){window.close()}} tabIndex="-1">Exit</div>
             </div>

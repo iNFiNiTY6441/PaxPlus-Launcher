@@ -11,6 +11,11 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
+
+const { session } = require('electron')
+
+
+
 const createWindow = async () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -46,19 +51,33 @@ const createWindow = async () => {
   });
   
 
-  LAUNCHER_CORE = new LauncherCore( remoteDataEndpoint, mainWindow );
-  LAUNCHER_CORE.showPage( "loading", { progress: 0.0, loadingText: "Starting core functions." } );
-  LAUNCHER_CORE.init_0().catch(error => {
-    console.log(error)
-    LAUNCHER_CORE.showPage( "critical", { errorHeading: "FATAL INIT ERROR", errorMessage: "Contact support or reinstall launcher.\r\n"+error.message } );
-  });
+  return mainWindow;
+
+  // LAUNCHER_CORE.init_0().catch(error => {
+  //   console.log(error)
+  //   LAUNCHER_CORE.showPage( "critical", { errorHeading: "FATAL INIT ERROR", errorMessage: "Contact support or reinstall launcher.\r\n"+error.message } );
+  // });
 };
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async function(){
-  createWindow();
+
+  // session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+  //   callback({
+  //     responseHeaders: {
+  //       ...details.responseHeaders,
+  //       'Content-Security-Policy': ['default-src \'self\'','script-src \'self\' \'none-285a6f8424\'','unsafe-inline \'true\'']
+  //     }
+  //   })
+  // })
+
+  let mainWindow = await createWindow();
+
+  
+  LAUNCHER_CORE = new LauncherCore( remoteDataEndpoint, mainWindow );
+  LAUNCHER_CORE.showPage( "loading", { progress: 0.0, loadingText: "Starting core functions." } );
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

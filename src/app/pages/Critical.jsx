@@ -21,11 +21,11 @@ function Critical() {
                 <div style={{ marginLeft: "56px"}}>
                     <h1 style={{color: "#EE3E0E"}}>ERROR</h1>
                     <p style={{ fontSize: "18px", letterSpacing:"0.2px", marginBottom:0}}>{searchParams.get("errorHeading")}</p>
-                    <p style={{ fontSize: "16px", opacity: 0.6, width:"400px"}}>{searchParams.get("errorMessage")}</p>
+                    <p style={{ fontSize: "16px", opacity: 0.7, width:"400px"}}>{searchParams.get("errorMessage")}</p>
 
                 </div>
 
-                <button className='darkButton edgeDots' style={{width:"120px", height: "34px", top: "180px", left:"340px", display: ()=> searchParams.get("actionName") != undefined ? "block" : "none"}} onClick={()=> {navigate( searchParams.get("actionURL") )}}> {searchParams.get("actionName")}</button>
+                <button tabIndex="-1" className='darkButton edgeDots' style={{width:"120px", height: "34px", top: "180px", left:"340px", display: searchParams.get("actionName") != undefined ? "block" : "none"}} onClick={()=> {navigate( searchParams.get("actionURL") )}}> {searchParams.get("actionName")}</button>
 
             </div>
 

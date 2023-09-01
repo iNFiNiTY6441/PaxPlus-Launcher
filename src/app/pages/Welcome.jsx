@@ -60,14 +60,12 @@ function Welcome() {
                 page == 0 && 
                 
                 <Dialog dialogTitle="Welcome" rightButtonName="BEGIN" rightButtonFunction={nextPage}>
-
-                    Hello there, <span style={{color: "#9df2f5"}}>Pilot</span>.
+                    Hello there, <strong>Pilot</strong>.
                     <br/><br/>
                     It looks like it's your first time using the
-                    <span style={{color: "#9df2f5"}}> PAX+ Launcher</span>.
+                    <strong> PAX+ Launcher</strong>.
                     <br/><br/>
                     Let's get you set up so you can join the fight.
-
                 </Dialog>
             }
 
@@ -76,10 +74,8 @@ function Welcome() {
                 <Dialog dialogTitle="GAME LOCATION" rightButtonName="PROCEED" rightButtonFunction={nextPage} rightButtonEnabled={!canProceed}>
 
                     In order to patch your game, the launcher needs to know its location. <br/><br/>
-                    Select the <span style={{color: "#9df2f5"}}>Hawken-PC-Shipping</span> folder of your installed <span style={{color: "#9df2f5"}}>PAX Client</span>.<br/><br/>
-                    It can be changed later at any time in the launcher settings.
-                    <br/>
-                    <br/>
+                    Select the <strong>Hawken-PC-Shipping</strong> folder of your installed <strong>PAX Client</strong>.<br/><br/>
+                    It can be changed later at any time in the launcher settings.<br/><br/>
 
                     <table style={{ width: "400px"}}>
 
@@ -89,7 +85,7 @@ function Welcome() {
                             <td style={{width: "435px", textAlign: "left", paddingLeft: "20px", fontSize: "13px"}}> { gamePath } </td>
 
                             <td className="edgeDots" style={{width: "90px", fontSize: "15px"}}>
-                                <button type="file" id="btn_exeFile" onClick={updateGamePath}>Select</button>
+                                <button tabIndex="-1" type="file" id="btn_exeFile" onClick={updateGamePath}>Select</button>
                                 <input type="file" id="input_exeFile"hidden/>
                             </td>
 
@@ -108,13 +104,13 @@ function Welcome() {
                 
                 <Dialog dialogTitle="READY" rightButtonName="ACKNOWLEDGE" rightButtonFunction={finishSetup}>
                     
-                    <span style={{color: "#9df2f5"}}>Great, you're all set up.</span>
+                    <strong>Great, you're all set up.</strong>
                     <br/><br/>
                     &gt; The game will update automatically as <br/>new patches become available.
                     <br/><br/>
                     &gt; You will be notified once a new version of this launcher <br/>is available for download
                     <br/><br/>
-                    <span style={{color: "#dcdf5e"}}>Enjoy & good luck out there, Pilot.</span>
+                    <span className='textColor_yellow'>Enjoy & good luck out there, Pilot.</span>
                 </Dialog>
             }
             

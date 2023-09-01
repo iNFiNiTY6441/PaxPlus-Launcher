@@ -1,46 +1,30 @@
 import React from 'react';
 import { useEffect, useState, useContext } from 'react';
 import ReactMarkdown from 'react-markdown'
+import { LauncherContext } from "../../LauncherContext.js";
 
 /**
  * Top status & logo bar UI component
  */
 const Topbar = () => {
 
-    const [counter, setCounter] = useState(60);
-
-    const [isOffline, setIsOffline] = useState(true);
-
-    const [launcherNews, setLauncherNews ] = useState([]);
-
-    const [patchVersion, setPatchVersion ] = useState("");
+   const LauncherState = useContext( LauncherContext );
 
 
-    useEffect(() => {
-        counter > 0 && setTimeout(() => setCounter(counter - 1), 1000);
-      }, [counter]);
-
-
-    async function initialize(){
-
-        setIsOffline( await LauncherCoreAPI.isEOL() );
-        setLauncherNews( await LauncherCoreAPI.getNews() );
-        setPatchVersion( await LauncherCoreAPI.getPatchVersion());
+    function MDlinkRenderer( props ){
+        console.log(props)
+        return <a href={props.href} tabIndex="-1">{props.children}</a>
     }
-
-    useEffect(() => {
-       
-        initialize();
-    }, []);
       
     return (
+
         <div className="menu_topBar">
 
             
             <div id="mainlogocontainer">
 
                 <h1>PAX-PLUS</h1>
-                <p>Launcher // v0.1.0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{patchVersion}</p>
+                <p>Launcher // v{LauncherState.version_launcher} - {LauncherState.version_patch}</p>
 
             </div>
 
@@ -49,29 +33,47 @@ const Topbar = () => {
                 
                 { /* WARNING BANNER: LAUNCHER IS EOL */ 
                 
-                isOffline == true && 
+                LauncherState.network_mode !== 0 && 
 
                     <div className='topbar_statusItem critical'>
 
                         <div className='icon'></div>
 
                         <h1>⚠ OFFLINE MODE</h1>
-                        <p>Launcher version is no longer supported. Please <a href='https://github.com/iNFiNiTY6441/PaxPlus-Launcher'>update.</a></p>
+
+                        { LauncherState.support_status === 'offline' && <p>No internet connection. Try restarting the launcher or play offline with the locally saved patch.</p> }
+
+                        { LauncherState.support_status === 'eol' && <p>Launcher version is no longer supported. Please <a tabIndex="-1" href='https://github.com/iNFiNiTY6441/PaxPlus-Launcher/releases'>update.</a></p> }
 
                     </div>
                 }
 
+                {
+                    LauncherState.network_mode === 0 && LauncherState.support_status !== 'latest' &&
+
+                    <div tabIndex="-1" key="updatewarning" className='topbar_statusItem'>
+
+                        <div className='icon'></div>
+
+                        <h1 className='textColor_yellow'>Update available</h1>
+
+                        <ReactMarkdown components={{ a: ({node, ...props}) => <a tabIndex="-1" {...props} />}}>A newer version is ready for download. [Update](https://github.com/iNFiNiTY6441/PaxPlus-Launcher/releases)</ReactMarkdown>
+
+                    </div>
+                }
+
+
                 { /* LAUNCHER NEWS FEED */ 
                 
-                !isOffline && launcherNews.map( newsItem => 
+                LauncherState.network_mode === 0 && LauncherState.news && LauncherState.news.map( newsItem => 
                     
-                    <div key={newsItem.title} className='topbar_statusItem'>
+                    <div tabIndex="-1" key={newsItem.title} className='topbar_statusItem'>
 
                         <div className='icon'></div>
 
                         <h1>{newsItem.title}</h1>
 
-                        <ReactMarkdown>{newsItem.message}</ReactMarkdown>
+                        <ReactMarkdown components={{ a: ({node, ...props}) => <a tabIndex="-1" {...props} />}}>{newsItem.message}</ReactMarkdown>
 
                     </div>
                 )}
@@ -80,6 +82,7 @@ const Topbar = () => {
 
 
         </div>
+
     );
 };
 

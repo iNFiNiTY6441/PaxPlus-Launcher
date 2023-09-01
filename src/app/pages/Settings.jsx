@@ -1,10 +1,14 @@
 import React, { useRef } from 'react'; 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import DynamicOption from '../components/DynamicOption/DynamicOption.jsx';
+
+import { LauncherContext } from "../LauncherContext.js";
 
 function Configure() {     
 
-    const [settingsData, setSettingsData] = useState({});
+    const LauncherState = useContext( LauncherContext );
+
+    //const [settingsData, setSettingsData] = useState({});
 
     const [gamePath, setGamePath] = useState(null);
 
@@ -14,11 +18,11 @@ function Configure() {
 
     async function fetchSettings() {
 
-        let settings = await LauncherCoreAPI.GetGameSettingsBase();
+        //let settings = await LauncherCoreAPI.GetGameSettingsBase();
         let gamePath = await LauncherCoreAPI.getUserConfigValue( "launcher","gamePath");
         let args = await LauncherCoreAPI.getUserConfigValue( "launcher","gameStartupArgs");
 
-        if ( settings ) setSettingsData( settings );
+        //if ( settings ) setSettingsData( settings );
         if ( gamePath ) setGamePath( gamePath );
         if ( args ) launchArgs.current = args;
     }
@@ -70,7 +74,7 @@ function Configure() {
                                 <td style={{width: "40px"}}>GAME EXE</td>
                                 <td style={{ width: "240px", textAlign: "left", paddingLeft: "20px", fontSize:"14px", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap"}} id="gamepath_dir">{gamePath}</td>
                                 <td className="edgeDots" style={{ width: "30px", fontSize: "15px"}}>
-                                <button type="file" id="gamepath_button" onClick={ updateGamePath }>Select</button>
+                                <button tabIndex="-1" type="file" id="gamepath_button" onClick={ updateGamePath }>Select</button>
                                 <input type="file" id="gamepath_input" ref={gamePath_InputRef} onChange={updateGamePath} hidden/>
                                 </td>
                             </tr>
@@ -96,7 +100,7 @@ function Configure() {
 
            
 
-            { Object.keys(settingsData).map( (section ) => 
+            { Object.keys(LauncherState.settings_layout).map( (section ) => 
                 
                 <div className="pagewindow" key={section}>
 
@@ -106,9 +110,9 @@ function Configure() {
                    
                         <tbody>
 
-                            { Object.keys(settingsData[section]).map( ( option ) => 
+                            { Object.keys(LauncherState.settings_layout[section]).map( ( option ) => 
 
-                                <DynamicOption optionsSection={section} optionsKey={option} optionsData={settingsData[section][option]} key={option}></DynamicOption>
+                                <DynamicOption optionsSection={section} optionsKey={option} optionsData={LauncherState.settings_layout[section][option]} key={option}></DynamicOption>
                                 )
                             }
 

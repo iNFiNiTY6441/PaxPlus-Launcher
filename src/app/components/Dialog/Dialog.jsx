@@ -18,7 +18,7 @@ const Dialog = ({children, dialogTitle, rightButtonName, rightButtonFunction, ri
 
                 <div className="buttonContainer" style={{display:  rightButtonName ? "block" : "none" }}>
 
-                    <button onClick={rightButtonFunction} disabled={rightButtonEnabled}> {rightButtonName}</button>
+                    <button tabIndex="-1" onClick={rightButtonFunction} disabled={rightButtonEnabled}> {rightButtonName}</button>
 
                 </div>
 
