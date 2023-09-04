@@ -36,6 +36,8 @@ class RemoteDataManager {
         this.filename = "remote_"+urlSegments[urlSegments.length-1];
 
         if ( options.localPath ) this.localPath = options.localPath+"\\"+this.filename;
+        
+        if ( options.requestHeaders ) this.requestHeaders = options.requestHeaders;
     }
 
     /**
@@ -109,6 +111,7 @@ class RemoteDataManager {
         const response = await axios.get( this.remoteUrl, {
             timeout: 4000,
             signal: AbortSignal.timeout(4000),
+            headers: this.requestHeaders
         }).catch( abortError => {
 
         });

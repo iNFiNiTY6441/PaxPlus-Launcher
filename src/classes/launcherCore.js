@@ -11,13 +11,21 @@ const PatchManager = require('./patchManager.js');
 
 const { DefaultState } = require("../app/defaultLauncherState.js");
 
+const { v4: uuidv4 } = require('uuid');
+
 const LAUNCHER_VERSION = "0.9.5";
+const LAUNCHER_UNIQUEID = uuidv4();
+
+const LAUNCHER_HEADERS = {
+    Authorization: "PAXPLUS4D5707DB",
+    LauncherID: LAUNCHER_UNIQUEID,
+    LauncherVersion: LAUNCHER_VERSION,
+}
 
 const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
     const hex = x.toString(16)
     return hex.length === 1 ? '0' + hex : hex
 }).join('')
-
 
 /**
  * Main launcher backend class
@@ -156,7 +164,8 @@ class LauncherCore {
      * Updates the global launcher state in the renderer process
      */
     pushLauncherStateUpdate(){
-        console.log("MAIN:STATEUPDATE")
+        console.log("     |- [STATE]: Pushed to renderer.")
+        console.log(""),
         this.mainWindow.webContents.send('LauncherStateUpdate', this.launcherState );
     }
 
@@ -173,6 +182,19 @@ class LauncherCore {
     }
 
     getVersionSupportStatus( version = LAUNCHER_VERSION ){
+
+        // Things are very very wrong
+        if ( !this.remoteConfiguration ) {
+
+            throw new Error("[CORE][getVersionSupportStatus]: LauncherCore fatal: Missing core data: remoteConfiguration");
+        }
+
+        // No remote data was ever retrieved 
+        if ( !this.remoteConfiguration.data ) return 'offline';
+
+        // Malformed remote data / logic mismatch, presume EOL for this launcher
+        if ( !this.remoteConfiguration.data.versions ) return 'eol';
+        
         if ( this.remoteConfiguration.data.versions.latest === version ) return 'latest';
         if ( this.remoteConfiguration.data.versions.supported.indexOf( version ) >= 0 ) return 'support';
         return 'eol';
@@ -231,15 +253,37 @@ class LauncherCore {
      */
     async updateRemoteConfigs() {
 
-        //console.log("[UPDATEREMOTECONFIGS]")
-
+        // Things are very very wrong
         if ( !this.patchData || !this.settingsData || !this.remoteConfiguration ) {
 
-            throw new Error("LauncherCore fatal: Missing core data");
+            throw new Error("[CORE][updateRemoteConfigs]: LauncherCore fatal: Missing core data");
         }
-        await this.remoteConfiguration.loadFrom('remote');
-        await this.patchData.loadFrom( 'remote', true );
-        await this.settingsData.loadFrom( 'remote', true );
+
+        try {
+
+            // Fetch new versions of remote data
+            await this.remoteConfiguration.loadFrom('remote'); // RemoteConfiguration should have no local fallback to ensure masterserver connection
+            await this.patchData.loadFrom( 'remote', true );
+            await this.settingsData.loadFrom( 'remote', true );
+
+            // Reset network mode in case we got the connection back
+            if ( this.launcherState.network_mode != 0 ) {
+                console.log("[CORE][updateRemoteConfigs]: GOING ONLINE: Masterserver connection restored.");
+                this.launcherState.network_mode = 0;
+                this.launcherState.support_status = this.getVersionSupportStatus();
+                this.pushLauncherStateUpdate();
+            }
+
+            // Failed to fetch on remoteConfig / failed to fetch settings or patch data with no local fallback available
+        } catch ( remoteConfigRetrievalError ) {
+            
+            // Set launcher into offline mode BUT DON'T CLEAR THE REFRESH INTERVAL - this allows reconnect attempt on next interval fire
+            console.log("[CORE][updateRemoteConfigs]: GOING OFFLINE: Failed retrieving remote launcher config.");
+            this.launcherState.network_mode = -1;
+            this.launcherState.support_status = 'offline'
+        }
+        
+
     }
 
     async getUserConfig() {
@@ -288,10 +332,22 @@ class LauncherCore {
         console.log("\r\n============ Core: GetServers =============");
         console.log("[GetServers]: Fresh? %s", getFresh );
 
-         // Specifically load the serverdata from remote only
-        await this.serverData.loadRemote();
+        try {
+
+            // Specifically load the serverdata from remote only
+            await this.serverData.loadRemote();
+            console.log("[GetServers]: Got %s servers", Object.keys( this.serverData.data ).length );
+
+        } catch ( serverRefreshError ) {
+
+            this.showPage( "menu/error", { 
+                errorHeading: `Failed fetching server list.`, 
+                errorMessage: serverRefreshError.message, 
+                actionName:"OK", 
+                actionURL: "/menu" 
+            });
+        }
        
-        console.log("[GetServers]: Got %s servers", Object.keys( this.serverData.data ).length );
         return this.serverData.data;
     }
 
@@ -456,33 +512,6 @@ class LauncherCore {
         this.mainWindow.loadURL( MAIN_WINDOW_WEBPACK_ENTRY+"#/"+page+"?"+queryString);
     }    
 
-    /**
-     * Queries the support status for the current launcher version.
-     * Ensures that the launcher only retrieves patches that are compatible with the launcher version
-     * 
-     * There is a differentiation between "latest" & "supported" ( multiple versions can be in "support" )
-     * This allows for easing in of update prompts to users
-     * 
-     * Versions that don't fall under either are considered EOL ( hard cutoff to prevent compatibility issues, killswitch too )
-     * 
-     */
-    async getLifeCycleStatus() {
-
-        const response = await axios.get( this.configEndpoint+"/launcherVersions.json",{
-            timeout: 4000,
-            signal: AbortSignal.timeout(4000),
-        }).catch( abortError => {
-            console.log(abortError);
-            return null;
-        })
-        
-        if ( !response || !response.data ) return 'eol';
-
-        if ( LAUNCHER_VERSION === response.data.latest ) return 'latest';
-        if ( response.data.supported.indexOf( LAUNCHER_VERSION ) >= 0 ) return 'support';
-        return 'eol';
-    }
-
     async launchGame( serverIP ) {
 
 
@@ -599,10 +628,9 @@ class LauncherCore {
                 actionURL: "/menu/play" 
             };
 
-            
             if ( gameLaunchError == "3221225781") {
 
-                err.errorMessage = "Microsoft Visual C++ is missing. Please install it before launching."
+                err.errorMessage = "UE3Redist is missing. Please install it before launching."
             }
             return this.showPage( "menu/error", err );
 
@@ -734,11 +762,11 @@ class LauncherCore {
         console.log("\r\n============ Core: INIT-2 =============");
 
 
-        this.remoteConfiguration = new RemoteDataManager( this.configEndpoint+"/launcherConfig.json", { onChange: (newData) => this.onRemoteConfigUpdate( newData )} );
+        this.remoteConfiguration = new RemoteDataManager( this.configEndpoint+"/launcherConfig.json", { requestHeaders: LAUNCHER_HEADERS, onChange: (newData) => this.onRemoteConfigUpdate( newData )} );
 
         // Launcher is still compatible for remote patching: Get patch package
-        this.patchData = new RemoteDataManager( this.configEndpoint+"/gamePatch.json", { localPath: this.localStoragePath, onChange: (newData) => this.onRemotePatchUpdate( newData ) } );
-        this.settingsData = new RemoteDataManager( this.configEndpoint+"/gameSettings.json", { localPath: this.localStoragePath, onChange: (newData) => this.onRemoteSettingsUpdate( newData )} );
+        this.patchData = new RemoteDataManager( this.configEndpoint+"/gamePatch.json", { localPath: this.localStoragePath, requestHeaders: LAUNCHER_HEADERS, onChange: (newData) => this.onRemotePatchUpdate( newData ) } );
+        this.settingsData = new RemoteDataManager( this.configEndpoint+"/gameSettings.json", { localPath: this.localStoragePath, requestHeaders: LAUNCHER_HEADERS, onChange: (newData) => this.onRemoteSettingsUpdate( newData )} );
 
 
         this.showPage( "loading", { progress: 0.3, loadingText: "Launcher configuration." } );
@@ -802,7 +830,7 @@ class LauncherCore {
                 await this.patchData.loadFrom( 'remote', true );
                 await this.settingsData.loadFrom( 'remote', true );
 
-                this.serverData = new RemoteDataManager( this.remoteConfiguration.data.masterserver_url+"/serverListings");
+                this.serverData = new RemoteDataManager( this.remoteConfiguration.data.masterserver_url+"/serverListings", {requestHeaders: LAUNCHER_HEADERS});
                 
             } catch ( remoteFetchError ) {
 
@@ -824,6 +852,8 @@ class LauncherCore {
         this.showPage( "loading", { progress: 1.0, loadingText: "Loading complete." } );
 
         console.log("/////////// CORE INIT COMPLETE ////////////");
+        console.log("");
+        console.log("[CORE][INIT_2][FINAL]: Fetching patch & settings data.")
 
         // Set initial state after startup
         this.launcherState.version_launcher = LAUNCHER_VERSION;

@@ -2,7 +2,7 @@ const { app, BrowserWindow, globalShortcut } = require('electron');
 
 const LauncherCore = require('./classes/launcherCore.js');
 
-const remoteDataEndpoint = "https://infinity6441.github.io/PaxPlus-Launcher-Remote";
+const remoteDataEndpoint = "http://78.47.65.130:281"//"https://infinity6441.github.io/PaxPlus-Launcher-Remote";
 
 var LAUNCHER_CORE = null;
 
