@@ -2,7 +2,7 @@
   "name": "paxplus-launcher",
   "productName": "paxplus",
   "version": "1.0.0",
-  "description": "Launcher & Configurator for Hawken PAX Client",
+  "description": "Launcher & Configurator for the Hawken PAX Client",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -32,24 +32,13 @@
   },
   "dependencies": {
     "@babel/preset-env": "^7.22.10",
-    "@reduxjs/toolkit": "^1.9.5",
     "axios": "^1.5.0",
-    "dgram": "^1.0.1",
-    "electron-shared-state": "^1.1.0",
     "electron-squirrel-startup": "^1.0.0",
-    "ini": "^4.1.1",
-    "js-ini": "^1.6.0",
-    "multi-ini": "^2.3.2",
-    "punt": "^2.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^8.0.7",
-    "react-redux": "^8.1.2",
     "react-refresh": "^0.14.0",
     "react-router-dom": "^6.15.0",
-    "react-tracked": "^1.7.11",
-    "remark-gfm": "^3.0.1",
-    "webpack-node-externals": "^3.0.0",
     "winattr": "^3.0.0"
   }
 }
