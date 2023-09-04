@@ -11,11 +11,7 @@ const PatchManager = require('./patchManager.js');
 
 const { DefaultState } = require("../app/defaultLauncherState.js");
 
-// Launcher version, currently test / dummy value for testing
-// 'latest' is 0.5.0
-// 'support' are 0.4.2, 0.4.1, 0.3.5
-// everything else will return as EOL
-const LAUNCHER_VERSION = "0.4.2";
+const LAUNCHER_VERSION = "0.9.5";
 
 const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
     const hex = x.toString(16)
