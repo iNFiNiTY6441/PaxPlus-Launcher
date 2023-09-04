@@ -740,12 +740,58 @@ class LauncherCore {
                     errorMessage: "Setup exited with exit code "+errorCode
                 }
 
+                // Missing UE3 Redist
                 if ( errorCode == "3221225781" ) {
-                    installError.errorHeading = "UE3Redist not installed.";
-                    installError.errorMessage = "Please run Binaries/Redist/UE3Redist.exe and restart the launcher."
-                }
 
-                return this.showPage( "error", installError );
+                    // UE3Redist setup file missing
+                    if ( !fs.existsSync( path.join( gameInstallationDirectory, "Binaries", "Redist", "UE3Redist.exe" ) ) ) {
+
+                        installError.errorHeading = "Microsoft Visual C++ 2010 not installed";
+                        installError.errorMessage = "Download and install Microsoft Visual C++ 2010 runtimes."
+                        return this.showPage( "error", installError );
+
+                    } else { // Setup exists, let's continue
+
+                        installError.errorHeading = "UE3Redist not installed.";
+                        installError.errorMessage = "Please run Binaries/Redist/UE3Redist.exe and restart the launcher."
+                        this.showPage( "error", installError );
+
+                        let result = dialog.showMessageBoxSync({ 
+                            title:"Missing Unreal 3 redistributables",
+                            message: "The PAX client requires Unreal Engine 3 redistributables to be installed. \r\nInstall now?",
+                            type: "error",
+                            buttons: ["Install","Cancel"],
+                        });
+
+                        // User hit cancel, cease all init
+                        if ( result !== 0 ) return; 
+
+
+                        let redistResult = null;
+
+                        // Perform setup
+                        try {
+
+                            redistResult =  await this.patchManager.setupUE3Redist();
+
+                            if ( redistResult !== 0 ) return;
+
+                            // Retry first time setup
+                            await this.init_1();
+
+                        } catch ( redistError ) {
+
+                            installError.errorHeading = "FATAL: Installation failed.";
+                            installError.errorMessage = redistError.message
+                            return this.showPage( "error", installError );
+                        }
+
+
+                    }
+
+                    
+                }
+                
             }
             
         }

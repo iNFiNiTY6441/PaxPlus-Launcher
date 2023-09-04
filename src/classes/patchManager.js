@@ -150,6 +150,21 @@ class PatchManager {
 
     }
 
+    async setupUE3Redist(){
+
+        const redistPath = path.join( this.gamePath, "Binaries", "Redist", "UE3Redist.exe" );
+
+        if ( !fs.existsSync( redistPath ) ) throw new Error("Couldn't find UE3Redist.exe in standard location.");
+
+        return new Promise( function( resolve, reject ) {
+
+            const setupChild = exec( `"${redistPath}"` );
+            setupChild.on('error', reject );
+            setupChild.on('exit', resolve );
+
+        }.bind(this));
+    }
+
     /**
      * Coordinates & performs all patch operations stored within the currently loaded patch config.
      * Patches the game completely.
