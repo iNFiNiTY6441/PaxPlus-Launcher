@@ -48,6 +48,10 @@ contextBridge.exposeInMainWorld('LauncherCoreAPI', {
         return ipcRenderer.invoke('Core:GetUserConfigValue', category, option );
     },
 
+    deleteUserConfigValue( category, option ) {
+        return ipcRenderer.invoke('Core:DeleteUserConfigValue', category, option );
+    },
+
     setUserConfigValue( category, option, value ) {
         return ipcRenderer.invoke('Core:SetUserConfigValue', category, option, value );
     },

@@ -40,7 +40,6 @@ async function getHash( filePath ) {
     hash.write( file )
     hash.end();
     let md5sum = hash.read();
-    console.log("HASHING "+md5sum)
     return md5sum;
 }
 

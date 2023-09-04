@@ -99,12 +99,17 @@ class PatchManager {
     async startGame( parameters = []){
 
         let exePath = path.join(this.gamePath,"Binaries","Win32" ,"HawkenGame-Win32-Shipping.exe");
-
-        let command = `${exePath} ${parameters.join(" ")}`
+        let command = `"${exePath}" ${parameters.join(" ")}`
+        console.log("Running command: ");
+        console.log(command)
 
         return new Promise( function( resolve, reject ) {
 
-            let gameRun = exec(command, function(err, stdout, stderr) {});
+            let gameRun = exec(command, function(err,   stdout, stderr) {
+                if ( err ) console.log(err);
+                // if ( stdout ) console.log(stdout)
+                // if ( stderr ) console.log(stderr)
+            });
 
             gameRun.on('error', reject )
             gameRun.on('exit', resolve );
@@ -117,21 +122,39 @@ class PatchManager {
      */
     async generateUserInis(){
 
-        const child = spawn(path.join(this.gamePath,"Binaries","Win32" ,"HawkenGame-Win32-Shipping.exe"), ["Server","Andromeda_DM"],{
-            windowsHide: true,
-            shell: false,
-            stdio: false,
-        });
 
-        await sleep(4000);
-        child.kill('SIGINT');
+        return new Promise( function( resolve, reject ) {
+
+            const setupChild = spawn(path.join(this.gamePath,"Binaries","Win32" ,"HawkenGame-Win32-Shipping.exe"), ["Server","Andromeda_DM"],{
+                windowsHide: true
+            });
+
+            let setupTimeout = setTimeout(() => {
+                console.log("[SETUP]: Killing setup. Timeout of 20s exceeded");
+                setupChild.kill('SIGINT');
+            }, 20000);
+
+            setupChild.on('error', reject )
+
+            setupChild.on('exit', (code, signal) => {
+
+                if (code && code != 0 ) {
+                    clearTimeout( setupTimeout );
+                    reject(code,signal);
+                }
+    
+                clearTimeout( setupTimeout );
+                resolve( code, signal );
+            });
+        }.bind(this));
+
     }
 
     /**
      * Coordinates & performs all patch operations stored within the currently loaded patch config.
      * Patches the game completely.
      */
-    async patchGame() {
+    async patchGame( cleanMechsetups = false ) {
 
         let isGameRunning = await this.isGameRunning();
 
@@ -148,7 +171,6 @@ class PatchManager {
 
             if ( patchOperation.filePath ) filePath = path.join( this.gamePath, patchOperation.filePath );
 
-            console.log(patchOperation)
             // Skip patching files that already have the correct hashes
             if ( filePath ) {
 
@@ -174,7 +196,9 @@ class PatchManager {
                     console.log("iniFilePatch")
                     filePath = path.join( this.iniPath, patchOperation.file );
                     
-                    console.log(patchOperation.file)
+                    //console.log(patchOperation.file)
+
+                    //if ( !fs.existsSync( filePath ) ) fs.writeFileSync(filePath,"");
                     //Regenerate missing inis from defaults
                     //if ( patchOperation.file.startsWith("Hawken") && !fs.existsSync( filePath ) ) fs.copyFileSync( path.join( this.gamePath, "HawkenGame", "Config", patchOperation.file.replace("Hawken","Default") ), filePath );
 
@@ -189,8 +213,9 @@ class PatchManager {
 
                 case 'mechsetupPatcher':
                     filePath = path.join( this.gamePath, "HawkenGame", "MechSetup_default.txt" );
+                    console.log("mechsetup clean="+cleanMechsetups)
                     const mechsetupFile = new MechsetupPatcher( filePath );
-                    await mechsetupFile.patchAllMechsetupData( JSON.parse( patchOperation.data ) );
+                    await mechsetupFile.patchAllMechsetupData( JSON.parse( patchOperation.data ), cleanMechsetups );
                     await mechsetupFile.saveSetup();
                     break;
 
@@ -210,7 +235,8 @@ class PatchManager {
                     const upkPatcher = new upkFilePatcher( filePath, tempPatchFilePath );
 
                     let result = await upkPatcher.patchUPK();
-                    console.log(result.stdout);
+                    console.log("DONE")
+                    //console.log(result.stdout);
                     break;
 
             }

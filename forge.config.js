@@ -1,7 +1,7 @@
 module.exports = {
   packagerConfig: {
 
-     icon: './src/resources/img/paxplus.ico'
+     icon: './src/resources/img/paxlauncher.ico'
   },
   rebuildConfig: {},
   makers: [
@@ -9,9 +9,9 @@ module.exports = {
       name: '@electron-forge/maker-squirrel',
       config: {
         // An URL to an ICO file to use as the application icon (displayed in Control Panel > Programs and Features).
-        icon: './src/resources/img/paxplus.ico',
+        icon: './src/resources/img/paxlauncher.ico',
         // The ICO file to use as the icon for the generated Setup.exe
-        setupIcon: './src/resources/img/paxplus.ico',
+        setupIcon: './src/resources/img/paxlauncher.ico',
       },
     },
     {

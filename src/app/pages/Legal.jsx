@@ -28,97 +28,76 @@ function About() {
 
             </div>  
 
-            <div className="pagewindow" style={{height:"100px"}}>
+            <div className="pagewindow" id="section_contact">
 
                 <h1 className="edgeDots">CONTACT</h1>
 
-                <div style={{display: "flex", marginTop:"10px"}}>
+                <div className='grid' id="grid_contact">
 
-                <div style={{ margin: "10px", marginLeft: "20px", fontSize: "16px", color: "#b4d0d1" }}>
-                    Legal
-                    <br/>
-                    <a tabIndex="-1" href="mailto:paxplus@protonmail.com" style={{ fontStyle: "Play Bold", fontSize: "18px", textDecoration: "none"}}>paxplus@protonmail.com</a>
+                <div>
+                    Legal<br/>
+                    <a tabIndex="-1" href="mailto:paxplus@protonmail.com">paxplus@protonmail.com</a>
                 </div>
 
-                <div style={{ margin: "10px", marginLeft: "100px", fontSize: "16px", color: "#b4d0d1" }}>
-                    Support & Chat
-                    <br/>
-                    <a tabIndex="-1" href="https://example.com" style={{ fontStyle: "Play Bold", fontSize: "18px", textDecoration: "none"}}>discord.gg/TO_BE_ADDED</a>
+                <div>
+                    Support & Chat<br/>
+                    <a className="highlight"tabIndex="-1" href="https://discord.gg/ezPm8ZS" >discord.gg/ezPm8ZS</a>
                 </div>
 
              </div>
 
         </div>
 
-        <div className="pagewindow">
+        <div className="pagewindow" id="section_credits">
 
             <h1 className="edgeDots">CREDITS</h1>
 
-            {/* <p style={{marginLeft:"20px",marginRight:"80px", marginTop:"20px", padding:"0", borderBottom:"1px solid #465657"}}>DEVELOPMENT</p> */}
+            <div className='grid' id="grid_credits" >
 
-            <div style={{display: "flex", marginTop: "14px", flexDirection: "column", flexWrap:"wrap", maxHeight: "80px", maxWidth:"650px", marginLeft:"0px",marginRight:"20px"}}>
+            <div className='grid_divider'><p>DEVELOPMENT</p></div>
 
-              <div style={{ margin: "10px", marginLeft: "20px", fontSize: "16px", color: "#b4d0d1"}}>
-                Research & Patches
-                <br/>
-                <a tabIndex="-1" href="https://discord.com/users/285990538644160512" title="open link" style={{ fontStyle: "Play Bold", fontSize: "20px", textDecoration: "none"}}>Sigil</a>
-              </div>
-
-              <div style={{ margin: "10px", marginLeft: "0px", fontSize: "16px", color: "#b4d0d1"}}>
-                Launcher Core & Design
-                <br/>
-                <a tabIndex="-1" href="https://discord.com/users/513926154571350016" title="open link" style={{ fontStyle: "Play Bold", fontSize: "20px", textDecoration: "none"}}>!NFiN!TY</a>
-              </div>
-
-              <div style={{ margin: "10px", marginLeft: "0px", fontSize: "16px", color: "#b4d0d1"}}>
-                Launcher Utilities
-                <br/>
-                <a tabIndex="-1" href="https://discord.com/users/120124072595030016" title="open link" style={{ fontStyle: "Play Bold", fontSize: "20px", textDecoration: "none"}}>TimeMaster</a>
-              </div>
-
-            </div>
-
-            {/* <p style={{marginLeft:"20px",marginRight:"80px", marginTop:"20px", padding:"0", borderBottom:"1px solid #465657"}}>EXTERNAL</p> */}
-
-            <div style={{display: "flex", marginTop: "14px", flexDirection: "column", flexWrap:"wrap", maxHeight: "80px", maxWidth:"650px", marginLeft:"00px",marginRight:"20px"}}>
-
-                <div style={{ margin: "10px", marginLeft: "20px", fontSize: "16px", color: "#b4d0d1"}}>
-                UPK Decompressor
-                <br/>
-                <a tabIndex="-1" href="https://www.gildor.org" title="open link" style={{ fontStyle: "Play Bold", fontSize: "18px", textDecoration: "none"}}>gildor.org</a>
+                <div>
+                    Research & Patches<br/>
+                    <a tabIndex="-1" href="https://discord.com/users/285990538644160512" title="open link">Sigil</a>
                 </div>
 
-                <div style={{ margin: "10px", marginLeft: "-14px", fontSize: "16px", color: "#b4d0d1"}}>
-                UPK Utils
-                <br/>
-                <a tabIndex="-1" href="https://github.com/wghost/UPKUtils" title="open link" style={{ fontStyle: "Play Bold", fontSize: "18px", textDecoration: "none"}}>github.com/wghost</a>
+                <div>
+                    Launcher Core & Design<br/>
+                    <a tabIndex="-1" href="https://discord.com/users/513926154571350016" title="open link">!NFiN!TY</a>
                 </div>
 
-            </div>
+                <div>
+                    Launcher Utilities<br/>
+                    <a tabIndex="-1" href="https://discord.com/users/120124072595030016" title="open link">TimeMaster</a>
+                </div>
+              
+                <div className='grid_divider'><p>EXTERNAL TOOLS</p></div>
 
-            <p style={{marginLeft:"20px",marginRight:"80px", marginTop:"20px", padding:"0", borderBottom:"1px solid #465657"}}>TESTING</p>
-
-            <div style={{display: "flex", marginTop: "-14px", flexDirection: "column", flexWrap:"wrap", maxHeight: "80px", maxWidth:"650px", marginLeft:"0px",marginRight:"20px"}}>
-
-                <div style={{ margin: "10px", marginLeft: "20px", fontSize: "16px"}}>
-                <a tabIndex="-1" href="https://www.example.com" title="open link" style={{ fontStyle: "Play Bold", fontSize: "18px", textDecoration: "none"}}>Tester Slot</a>
+                <div>
+                    UPK Decompressor<br/>
+                    <a tabIndex="-1" href="https://www.gildor.org" title="open link">gildor.org</a>
                 </div>
 
-                <div style={{ margin: "10px", marginLeft: "0px", fontSize: "16px"}}>
-                <a tabIndex="-1" href="https://www.example.com" title="open link" style={{ fontStyle: "Play Bold", fontSize: "18px", textDecoration: "none"}}>Tester Slot</a>
+                <div>
+                    UPK Utils<br/>
+                    <a tabIndex="-1" href="https://github.com/wghost/UPKUtils" title="open link">github.com/wghost</a>
                 </div>
 
-                <div style={{ margin: "10px", marginLeft: "0px", fontSize: "16px"}}>
-                <a tabIndex="-1" href="https://www.example.com" title="open link" style={{ fontStyle: "Play Bold", fontSize: "18px", textDecoration: "none"}}>Tester Slot</a>
+                <div className='grid_divider'><p>TESTING</p></div>
+
+                <div>
+                    <a tabIndex="-1" href="https://discord.com/users/181997064962572288" title="open link">Shug</a>
                 </div>
 
-                <div style={{ margin: "10px", marginLeft: "0px", fontSize: "16px"}}>
-                <a tabIndex="-1" href="https://www.example.com" title="open link" style={{ fontStyle: "Play Bold", fontSize: "18px", textDecoration: "none"}}>Tester Slot</a>
+                <div>
+                    <a tabIndex="-1" href="https://discord.com/users/248873012676395018" title="open link">DragonStrike406</a>
+                </div>
+
+                <div>
+                    <a tabIndex="-1" href="https://www.example.com" title="open link">Tester Slot</a>
                 </div>
 
             </div>
-
-
 
         </div>
 

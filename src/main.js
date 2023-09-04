@@ -1,4 +1,4 @@
-const { app, ipcMain, dialog, BrowserWindow } = require('electron');
+const { app, BrowserWindow, globalShortcut } = require('electron');
 
 const LauncherCore = require('./classes/launcherCore.js');
 
@@ -11,11 +11,6 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-
-const { session } = require('electron')
-
-
-
 const createWindow = async () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -27,10 +22,12 @@ const createWindow = async () => {
     resizable: false,
   });
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
   mainWindow.setMenu(null)
 
+  // Open the DevTools.
+  globalShortcut.register('Shift+CommandOrControl+I', () => {
+    mainWindow.webContents.openDevTools();
+  })
 
   // OPEN ALL EXTERNAL HREF LINKS IN DEFAULT BROWSER INSTEAD OF THE ELECTRON APP
   var handleRedirect = (e, url) => {
@@ -52,11 +49,6 @@ const createWindow = async () => {
   
 
   return mainWindow;
-
-  // LAUNCHER_CORE.init_0().catch(error => {
-  //   console.log(error)
-  //   LAUNCHER_CORE.showPage( "critical", { errorHeading: "FATAL INIT ERROR", errorMessage: "Contact support or reinstall launcher.\r\n"+error.message } );
-  // });
 };
 
 // This method will be called when Electron has finished
@@ -75,9 +67,15 @@ app.on('ready', async function(){
 
   let mainWindow = await createWindow();
 
-  
-  LAUNCHER_CORE = new LauncherCore( remoteDataEndpoint, mainWindow );
-  LAUNCHER_CORE.showPage( "loading", { progress: 0.0, loadingText: "Starting core functions." } );
+  try {
+
+    LAUNCHER_CORE = new LauncherCore( remoteDataEndpoint, mainWindow );
+    LAUNCHER_CORE.showPage( "loading", { progress: 0.0, loadingText: "Starting core functions." } );
+  } catch ( error ) {
+
+    LAUNCHER_CORE.showPage( "error", { errorHeading: "FATAL ERROR", errorMessage: "Launcher failed to initialize. Contact support or reinstall launcher."+error.message } );
+  }
+
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

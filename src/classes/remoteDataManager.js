@@ -97,7 +97,6 @@ class RemoteDataManager {
         this.data = parsedData;
 
         // Call update handler if available
-        console.log(this.onChangedCallback)
         if ( this.onChangedCallback ) this.onChangedCallback( parsedData );   
     }
 
@@ -125,7 +124,6 @@ class RemoteDataManager {
         if ( this.localPath ) fs.writeFileSync( this.localPath + "\\", JSON.stringify( response.data , null, 2 ) );
 
         // Call update handler if available
-        console.log(this.onChangedCallback)
         if ( this.onChangedCallback ) this.onChangedCallback( response.data );
     }
 }

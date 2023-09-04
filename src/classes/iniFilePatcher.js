@@ -157,6 +157,7 @@ class IniFilePatcher {
      * @param {*} value - The value to set for the key in the section of the INI file.
      */
     setValue(section, key, value) {
+        if(!this.config[section]) this.config[section] = {};
         this.config[section][key] = value;
         return
     }

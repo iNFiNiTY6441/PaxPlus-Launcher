@@ -1,5 +1,5 @@
 import React from 'react'; 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams} from "react-router-dom";
 import Dialog from '../components/Dialog/Dialog.jsx';
 
@@ -8,8 +8,11 @@ function Welcome() {
     const navigate = useNavigate();
 
     const [gamePath, setGamePath] = useState("No folder selected.");
+    const [documentsPath, setDocumentsPath] = useState("Use default.");
     const [errorMessage, setErrorMessage] = useState("");
     const [canProceed, setCanProceed] = useState(false);
+
+    const docPageButton = useRef(null);
 
     const [page, setPage] = useState(0);
 
@@ -38,6 +41,21 @@ function Welcome() {
 
     }
 
+    async function updateDocumentsPath( event ){
+
+        let result = await LauncherCoreAPI.OpenFileDialog();
+
+        if ( result && !result.cancelled && result.filePaths.length > 0 ) {            
+
+            setDocumentsPath( result.filePaths[0] );
+        }
+    }
+
+    function resetDocumentsPath(){
+
+        setDocumentsPath("Use default.");
+    }
+
     function nextPage(){
         setPage( page+1 );
     }
@@ -46,9 +64,12 @@ function Welcome() {
         setPage( page-1 );
     }
 
-    function finishSetup(){
+    async function finishSetup(){
+
+        await LauncherCoreAPI.setUserConfigValue( "launcher","gamePath", gamePath );
+        if ( documentsPath && documentsPath.length > 0 && documentsPath != "Use default.") await LauncherCoreAPI.setUserConfigValue( "launcher","documentsPath", documentsPath );
+        await LauncherCoreAPI.SaveGameSettings();
         LauncherCoreAPI.finishSetup();
-        //navigate("/menu");
     }
 
     return (
@@ -99,8 +120,46 @@ function Welcome() {
                 </Dialog> 
             }
 
+
+            { page == 2 &&
+                        
+                <Dialog dialogTitle="OPTIONAL - DOCUMENTS FOLDER" rightButtonName="CONTINUE" rightButtonFunction={nextPage} rightButtonEnabled={!canProceed}>
+
+                    Some users may have moved their default <strong>Windows 'Documents' folder</strong><br/>onto another disk or into another folder.<br/><br/>
+                    <strong className='textColor_yellow'>If your 'Documents' folder is in a custom location, please select it below: </strong>
+                    <br/><br/>
+                    <strong>This step is optional - if you don't know what it means, you can skip it right away.</strong><br/><br/>
+                    <br/>
+
+                    <table style={{ width: "400px"}}>
+
+                        <tbody>
+                        <tr>
+
+                            <td style={{width: "435px", textAlign: "left", paddingLeft: "20px", fontSize: "13px"}}> { documentsPath} </td>
+
+                            <td className="edgeDots" style={{width: "90px", fontSize: "15px"}}>
+                                <button tabIndex="-1" type="file" id="btn_exeFile" onClick={updateDocumentsPath}>Change</button>
+                                <input type="file" id="input_exeFile"hidden/>
+                            </td>
+
+                            <td className="edgeDots" style={{width: "90px", fontSize: "15px"}}>
+                                <button tabIndex="-1" id="btn_exeFile" onClick={ resetDocumentsPath }>Reset</button>
+                                <input type="file" id="input_exeFile"hidden/>
+                            </td>
+
+                        </tr>
+                        </tbody>
+
+                    </table>
+
+                    <p style={{color: "#EE3E0E" }}>{errorMessage}</p>
+
+                </Dialog> 
+            }
+
             {
-                page == 2 && 
+                page == 3 && 
                 
                 <Dialog dialogTitle="READY" rightButtonName="ACKNOWLEDGE" rightButtonFunction={finishSetup}>
                     

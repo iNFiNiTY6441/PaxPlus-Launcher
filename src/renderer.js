@@ -20,12 +20,12 @@ render();
 /**
  * HANDLE MESSAGES FROM PRELOAD / MAIN
  */
-window.addEventListener("message", (event) => {
-  // event.source === window means the message is coming from the preload
-  // script, as opposed to from an <iframe> or other source.
-  console.log(event.data)
-  console.log(event.source)
-});
+// window.addEventListener("message", (event) => {
+//   // event.source === window means the message is coming from the preload
+//   // script, as opposed to from an <iframe> or other source.
+//   // console.log(event.data)
+//   // console.log(event.source)
+// });
 
 // Add this to the end of the existing file
 //import './app.jsx';

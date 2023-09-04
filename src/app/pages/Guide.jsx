@@ -52,8 +52,8 @@ function Guide() {
                             <p> 
                                 <strong className='textColor_yellow'>PAX</strong> or <strong className='textColor_yellow'>PAX Client</strong> is a <strong>2012 pre-alpha</strong> client of Hawken, originally shown at <strong>PAX East 2012.</strong>
                                 <br/> <br/>
-                                It has found its way into the hands of the community many years ago,
-                                <br/>and has recently seen a resurgence and increased interest from players and modders alike.
+                                After finding its way into hands of the community years ago,
+                                <br/>it has recently seen a resurgence and increased interest from players and modders alike.
                                 <br/>
                             </p>
 
@@ -100,7 +100,7 @@ function Guide() {
                                 <strong className='textColor_yellow'>When the game is not yet open</strong><br/>
                                 &gt;&nbsp;&nbsp;&nbsp;&nbsp;Press the <strong>'JOIN' Button</strong> to <strong>launch the game and directly connect</strong> to your chosen server.<br/><br/>
                                 <strong className='textColor_yellow'>When the game is already open / connected</strong><br/>
-                                &gt;&nbsp;&nbsp;&nbsp;&nbsp;Press the <strong>'COPY CMD' Button</strong> and <strong>paste the console command into the in-game console</strong><br/>
+                                &gt;&nbsp;&nbsp;&nbsp;&nbsp;Press the <strong>'COPY CMD' Button</strong> and <strong>paste the console command into the in-game console.</strong><br/>
                                 <br/> 
                                 <strong>You can open the in-game console using the <span className='keyboardHint'>&nbsp;`&nbsp;</span> key.</strong><br/>
                             </p>
@@ -116,7 +116,7 @@ function Guide() {
                             <h3>Can I host my own public server?</h3>
                             <p>
                                 <strong>Yes! You can even have it listed on the launcher server-list</strong><br/>
-                                Check the #server-hosting channel on the discord for help & instructions.<br/>
+                                Check the <a href='https://discord.com/channels/390593866690068480/1117184340800057485'>#server-hosting-tutorial</a> channel on the discord for help & instructions.<br/>
                             </p>
 
                         </>
@@ -127,7 +127,7 @@ function Guide() {
                         <>
                             <br/>
                             
-                            <h3>Opening the console</h3>
+                            <h3>Opening the in-game console</h3>
                             <p><strong>You can open the in-game console using the <span className='keyboardHint'>&nbsp;`&nbsp;</span> key.</strong></p>
                             
                             <h3>Show FPS</h3>

@@ -10,10 +10,12 @@ import { LauncherContext } from "../../LauncherContext.js";
 function ServerList({canLaunch, launchGame }) {
 
 
+    const defaultServerData = { meta: { players:0, capacity:0}, servers: {}}
+
     // Launcher global state context
     const { network_mode, game_running } = useContext( LauncherContext );
 
-    const [serverData, setServerData] = useState({ meta: { players:0, capacity:0}, servers: {}});
+    const [serverData, setServerData] = useState(defaultServerData);
 
     const [serverLoading, setServerLoading] = useState(false);
     const [serverError, setServerError] = useState(null);
@@ -63,13 +65,14 @@ function ServerList({canLaunch, launchGame }) {
     function manualRefresh() {
 
         //setServerLoading(true);
+        setServerData(defaultServerData)
         fetchServers();
     }
 
     useEffect(() => {
             
         //fetchServers();
-        console.log(game_running)
+        // console.log(game_running)
         initialize();
     }, []);
     
@@ -101,7 +104,7 @@ function ServerList({canLaunch, launchGame }) {
 
                                 <td> {serverData.servers[serverIP].players} / {serverData.servers[serverIP].maxPlayers} </td>
 
-                                <td> <button tabIndex="-1" onClick={(event) => {copyIP(event.target,serverIP)}}>COPY CMD</button> </td>
+                                <td> <button tabIndex="-1" onClick={(event) => {copyIP(event.target,"Open "+serverIP)}}>COPY CMD</button> </td>
                     
                                 <td> <button tabIndex="-1" disabled={ game_running == true } onClick={ () => { launchGame(serverIP)} }> { game_running == false ? "JOIN" : "RUNNING"}</button> </td>
                             </tr>

@@ -39,73 +39,42 @@ class MechsetupPatcher {
     }
 
     /**
-     * Patches MechSetup value entries for a given mech. 
-     * Will add a new mech entry if the mech to be patched is not yet in MechSetup.
-     * 
-     * @param {String} mechName MechName property of the mech to patch
-     * @param {Object} patchObject Object containing the key-value pairs for the mechsetup patch
-     */
-
-    patchMech( mechName, patchObject ) {
-
-        // Add mech if non existant
-        if ( Object.keys( this.config ).indexOf( mechName ) == -1 ) {
-            
-            // Default mech entry based on pax+ berserker
-            this.config[mechName] = defaultMechEntry;
-        }
-
-        for ( let key in patchObject ) {
-            console.log(key)
-
-            // Don't add new keys to mechsetup object, if they aren't already present
-            if ( Object.keys( this.config[mechName] ).indexOf( key ) == -1 ) continue;
-
-            // Set key to patched value
-            this.config[mechName][key] = patchObject[key];
-        }
-    }
-
-    /**
      * Parses mechsetup data from the raw game file text format into a workable JSON format for patching
      * 
      * @param {*} rawText Raw text data from the game mechsetup file
      * @returns Mechsetup data in object format
      */
 
-    parseSetupText( rawText ){
+    parseSetupText( rawText ) {
 
         let setupObject = {};
 
-        let mechChunks = rawText.split(/MechName=/g);
-        
-        for ( let i = 1; i < mechChunks.length; i++ ) {
-            
-            let mechConfigLines = mechChunks[i].split(/\r\n/g);
-            let mechName = mechConfigLines[0];
+        let lines = rawText.split("\r\n");
 
-            setupObject[mechName] = {};
+        let mechName = "";
 
-            for ( let j = 1; j < mechConfigLines.length; j++ ) {
+        for ( let i = 0; i < lines.length; i++ ) {
 
-                let key = mechConfigLines[j].split(/=/g)[0];
-                let value = mechConfigLines[j].split(/=/g)[1];
+            let key = lines[i].split("=")[0];
+            let value = lines[i].split("=")[1];
 
-                if ( !key || key.length == 0 ) continue;
+            if ( key == "MechName" ) {
 
-                // Rename duplicate keys to prevent data merging in setup object
-                while ( setupObject[mechName][key] != undefined ) {
-
-                    key = key+"._duplicate"
-                }
-
-                setupObject[mechName][key] = value;
+                mechName = value;
+                continue;
             }
+
+            if ( mechName == "" ) continue;
+
+            if ( !setupObject[mechName] ) setupObject[mechName] = {};
+            
+            while ( setupObject[mechName][key] != undefined ) key = key+"._duplicate";
+
+            setupObject[mechName][key] = value;
         }
 
         return setupObject;
     }
-
 
     /**
      * Patches the entire MechSetup config from a target patchdata object / json
@@ -113,10 +82,9 @@ class MechsetupPatcher {
      * @param {Object} patchObject Object containing all mechs and their data required for patching
      */
 
-    patchAllMechsetupData( patchObject ) {
+    patchAllMechsetupData( patchObject, cleanSlate = false  ) {
 
         // Remove setups that aren't present in patch data
-
         for ( let mechName in this.config ) {
 
             if ( Object.keys( patchObject ).indexOf( mechName ) == -1 ) {
@@ -127,20 +95,16 @@ class MechsetupPatcher {
 
         for ( let mechName in patchObject ) {
 
-            // NEW MECH
-            if ( Object.keys( this.config ).indexOf( mechName ) == -1 ) {
+            if ( !this.config[mechName] || cleanSlate === true ) {
+                if ( cleanSlate ) console.log("Wiping mech to patch baseline: "+mechName);
+                if ( !cleanSlate ) console.log("Adding new mech: "+mechName)
+                this.config[mechName] = Object.assign({}, defaultMechEntry);
+                this.config[mechName] = Object.assign(this.config[mechName], patchObject[mechName].initial );
+            }
 
-                this.config[mechName] = defaultMechEntry;
-                console.log("NEW MECH: "+mechName);
-                console.log(patchObject[mechName].initial)
-                this.patchMech( mechName , patchObject[mechName].initial );
-            } 
-            console.log(patchObject[mechName].persist)
-            this.patchMech( mechName , patchObject[mechName].persist );
-
+            this.config[mechName] = Object.assign(this.config[mechName], patchObject[mechName].persist );
         }
-
-
+       //console.log(this.config)
     }
 
     /**
@@ -168,7 +132,7 @@ class MechsetupPatcher {
                 if ( key.indexOf("._duplicate") >= 0 ) {
                     key = key.split("._duplicate")[0];
                 }
-
+                //console.log(`${key}=${value}`)
                 // Add key value pair to output text
                 setupText.push(`${key}=${value}`);
             }

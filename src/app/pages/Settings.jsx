@@ -11,8 +11,10 @@ function Configure() {
     //const [settingsData, setSettingsData] = useState({});
 
     const [gamePath, setGamePath] = useState(null);
+    const [documentsPath, setDocumentsPath] = useState("Use default.");
 
     const gamePath_InputRef = useRef(null);
+    const documentsPath_InputRef = useRef(null);
 
     const launchArgs = useRef("");
 
@@ -20,10 +22,12 @@ function Configure() {
 
         //let settings = await LauncherCoreAPI.GetGameSettingsBase();
         let gamePath = await LauncherCoreAPI.getUserConfigValue( "launcher","gamePath");
+        let documentsPath = await LauncherCoreAPI.getUserConfigValue( "launcher","documentsPath");
         let args = await LauncherCoreAPI.getUserConfigValue( "launcher","gameStartupArgs");
 
         //if ( settings ) setSettingsData( settings );
         if ( gamePath ) setGamePath( gamePath );
+        if ( documentsPath ) setDocumentsPath( documentsPath );
         if ( args ) launchArgs.current = args;
     }
 
@@ -36,8 +40,21 @@ function Configure() {
             console.log(result.filePaths[0]);
 
             await LauncherCoreAPI.setUserConfigValue( "launcher","gamePath", result.filePaths[0] );
+            await auncherCoreAPI.setUserConfigValue( "launcher", "clearmechsetups", true );
     
             setGamePath( result.filePaths[0] );
+        }
+
+    }
+
+    async function updateDocumentsPath(event) {
+
+        let result = await LauncherCoreAPI.OpenFileDialog();
+
+        if ( result && !result.cancelled && result.filePaths.length > 0 ) {
+
+            await LauncherCoreAPI.setUserConfigValue( "launcher","documentsPath", result.filePaths[0] );
+            setDocumentsPath( result.filePaths[0] );
         }
 
     }
@@ -70,8 +87,18 @@ function Configure() {
                 <table id="table_graphicsOptions">
 
                     <tbody>
+
                             <tr>
-                                <td style={{width: "40px"}}>GAME EXE</td>
+                                <td style={{width: "40px", fontSize:"13px" }}>DOCUMENTS</td>
+                                <td style={{ width: "240px", textAlign: "left", paddingLeft: "20px", fontSize:"14px", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap"}} id="gamepath_dir">{documentsPath}</td>
+                                <td className="edgeDots" style={{ width: "30px", fontSize: "15px"}}>
+                                <button tabIndex="-1" type="file" id="gamepath_button" onClick={ updateDocumentsPath }>Change</button>
+                                <input type="file" id="gamepath_input" ref={documentsPath_InputRef} onChange={ updateDocumentsPath } hidden/>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style={{width: "40px", fontSize:"13px"}}>GAME EXE</td>
                                 <td style={{ width: "240px", textAlign: "left", paddingLeft: "20px", fontSize:"14px", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap"}} id="gamepath_dir">{gamePath}</td>
                                 <td className="edgeDots" style={{ width: "30px", fontSize: "15px"}}>
                                 <button tabIndex="-1" type="file" id="gamepath_button" onClick={ updateGamePath }>Select</button>

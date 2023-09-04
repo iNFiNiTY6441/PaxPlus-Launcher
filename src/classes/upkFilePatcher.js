@@ -50,7 +50,17 @@ class upkFilePatcher {
     
         let patchCommand = `${patcherTool} "${patchFilePath}" "${upkDirectory}"`
     
-        let output = await exec(patchCommand, { cwd: patcherDirectory } ).catch( err => { throw new Error("PATCHUPK FATAL!", { cause: err })});
+        let output = await exec(patchCommand, { cwd: patcherDirectory } ).catch( err => { 
+            
+            if ( err.code == "3221225781" ) {
+
+                throw new Error("UE3 Redistributables are not installed. Please run Binaries/Redist/UE3Redist.exe ")
+            }
+
+            throw err;
+        
+        });
+
         return output;
     }
 }

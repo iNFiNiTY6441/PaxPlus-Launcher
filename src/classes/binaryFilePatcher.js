@@ -166,7 +166,6 @@ class binaryFilePatcher {
             await exec(decompressCommand, {cwd: decompressorPath} ).catch( err => { throw new Error("Decompression failure. Make sure to place decompress.exe next to pax+.exe", { cause: err })});
     
             await fs.renameSync( path.join( path.dirname(filePath), "..", "unpacked", fileName), filePath  );
-            console.log("DECOMP DONE")
         }
     }
 

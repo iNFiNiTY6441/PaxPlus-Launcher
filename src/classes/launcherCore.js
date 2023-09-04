@@ -112,6 +112,11 @@ class LauncherCore {
             return this.setUserConfigValue( category, option, value );
         });
 
+        // Delete a specific userconfig key
+        ipcMain.handle('Core:DeleteUserConfigValue', ( event, category, option, value ) => {
+            return this.setUserConfigValue( category, option, value );
+        });
+
         /////////////////////////////// GAME SETTINGS ////////////////////////////////////
 
         /**
@@ -157,10 +162,6 @@ class LauncherCore {
     pushLauncherStateUpdate(){
         console.log("MAIN:STATEUPDATE")
         this.mainWindow.webContents.send('LauncherStateUpdate', this.launcherState );
-        
-        // this.mainWindow.webContents.on('did-finish-load', () => {
-        //     this.mainWindow.webContents.send('LauncherStateUpdate', this.launcherState );
-        // });
     }
 
     /**
@@ -176,15 +177,12 @@ class LauncherCore {
     }
 
     getVersionSupportStatus( version = LAUNCHER_VERSION ){
-        console.log(this.remoteConfiguration.data)
-        console.log(version)
         if ( this.remoteConfiguration.data.versions.latest === version ) return 'latest';
         if ( this.remoteConfiguration.data.versions.supported.indexOf( version ) >= 0 ) return 'support';
         return 'eol';
     }
 
     isVersionSupported( version = LAUNCHER_VERSION ) {
-        console.log(version)
         return this.getVersionSupportStatus( version ) != 'eol';
     }
 
@@ -200,7 +198,10 @@ class LauncherCore {
         if ( configData.versions.supported.indexOf( LAUNCHER_VERSION ) >= 0 ) support = 'support';
         this.launcherState.support_status = support;
 
-        if ( support === 'eol' ) this.launcherState.network_mode = 1;
+        if ( support === 'eol' ) {
+            this.launcherState.network_mode = 1;
+            clearInterval( this.remoteRefreshInterval );
+        }
 
         if ( configData.update_interval !== this.launcherState.update_interval ) {
             
@@ -261,6 +262,13 @@ class LauncherCore {
     }
 
     async setUserConfigValue( category, option, value ) {
+
+        if ( !this.configManager ) throw new Error("[setUserConfigValue]: FATAL! configManager not initialized.");
+
+        return this.configManager.setOption( category, option, value );
+    }
+
+    async deleteUserConfigValue( category, option) {
 
         if ( !this.configManager ) throw new Error("[setUserConfigValue]: FATAL! configManager not initialized.");
 
@@ -328,8 +336,24 @@ class LauncherCore {
 
         if ( value == null || value == undefined ) {
 
-            // Load game ini & get the needed value
-            let iniLoader = new IniFilePatcher( path.join( this.iniPath, `${setting.ini.file}.ini` ) );
+            let iniLoader = null
+
+            try {
+
+                // Load game ini & get the needed value
+                iniLoader = new IniFilePatcher( path.join( this.iniPath, `${setting.ini.file}.ini` ) )
+
+            } catch ( iniLoadError ) {
+
+                let err = { 
+                    errorHeading: `Fatal settings error - restart launcher.`, 
+                    errorMessage: iniLoadError.message, 
+                    actionName:"OK", 
+                    actionURL: "/menu/play" 
+                };
+                this.showPage( "menu/error", err );
+                return null;
+            }
             
             debug_dataSource = "(INI)"
     
@@ -515,7 +539,13 @@ class LauncherCore {
         try {
             // Perform upk & base ini patching
             this.showPage( "menu/loading", { progress: 0.4, loadingText: "Patching game..." } );
-            await this.patchManager.patchGame();
+
+            let shouldWipeMechs = this.configManager.getOption("launcher","clearmechsetups");
+            if ( shouldWipeMechs == undefined || shouldWipeMechs == null ) shouldWipeMechs = true;
+
+            await this.patchManager.patchGame( shouldWipeMechs );
+
+            this.configManager.setOption( "launcher", "clearmechsetups", false );
             
             // Apply userCfg values over base-patched inis
             this.showPage( "menu/loading", { progress: 0.4, loadingText: "Applying user settings..." } );
@@ -558,10 +588,37 @@ class LauncherCore {
 
         this.showPage( "menu/play");
 
-        await this.patchManager.startGame( gameArgs );
+        let output = "";
 
-        this.launcherState.game_running = false;
-        this.pushLauncherStateUpdate();
+        try {
+
+            output = await this.patchManager.startGame( gameArgs );
+
+        } catch ( gameLaunchError ) {
+
+            let err = { 
+                errorHeading: "Failed to launch game.", 
+                errorMessage: "Please contact support. Exit code: "+output, 
+                actionName:"OK", 
+                actionURL: "/menu/play" 
+            };
+
+            
+            if ( gameLaunchError == "3221225781") {
+
+                err.errorMessage = "Microsoft Visual C++ is missing. Please install it before launching."
+            }
+            return this.showPage( "menu/error", err );
+
+        } finally {
+
+            console.log("Game quit: ")
+            console.log( output );
+
+            this.launcherState.game_running = false;
+            this.pushLauncherStateUpdate();
+        }
+        
     }
 
     async finishSetup(){
@@ -574,8 +631,28 @@ class LauncherCore {
         console.log("\r\n============ Core: INIT-0 =============");
 
         this.showPage( "loading", { progress: 0.1, loadingText: "User configuration." } );
-        this.configManager = new ConfigManager( path.join( this.localStoragePath, 'userConfig.json' ) );
-        
+
+        try {
+
+            this.configManager = new ConfigManager( path.join( this.localStoragePath, 'userConfig.json' ) );
+            
+        } catch ( userConfigLoadError ) {
+
+            console.log(userConfigLoadError);
+
+            let err = { 
+                errorHeading: `Launcher user configuration corrupt.`, 
+                errorMessage: "Your settings have been reset.", 
+                actionName:"ACKNOWLEDGE", 
+                actionURL: "/welcome"
+            };
+
+            fs.rmSync(path.join( this.localStoragePath, 'userConfig.json' ));
+            this.configManager = new ConfigManager( path.join( this.localStoragePath, 'userConfig.json' ) );
+
+            return this.showPage( "error", err );
+
+        } 
         console.log( "[CORE][INIT_0][1]: UserConfig loaded.");
 
         // Check if game
@@ -583,7 +660,10 @@ class LauncherCore {
         console.log( "[CORE][INIT_0][2]: Game Path: "+gameInstallationDirectory );
 
         // Something is wrong with the game directory, return to FTUE
-        if ( !gameInstallationDirectory || !fs.existsSync( gameInstallationDirectory ) ) return this.showPage("welcome");
+        if ( !gameInstallationDirectory || !fs.existsSync( gameInstallationDirectory ) ) {
+            this.configManager.setOption( "launcher", "clearmechsetups", true );
+            return this.showPage("welcome");
+        }
         
         console.log( "[CORE][INIT_0][3]: ALL SYSTEMS GO, PROCEED TO INIT_1");
         await this.init_1();
@@ -600,6 +680,10 @@ class LauncherCore {
 
         // Default hawken ini directory
         this.iniPath = path.join(process.env.USERPROFILE, 'Documents', 'My Games', 'Hawken_PAXPlus', 'HawkenGame', 'Config');
+
+        // Allow for custom documents directories on other drives / in other folders
+        let customDocuments =  this.configManager.getOption("launcher","documentsPath");
+        if ( customDocuments ) this.iniPath = path.join( customDocuments, 'My Games', 'Hawken_PAXPlus', 'HawkenGame', 'Config' );
 
         // Get DefaultEngine.ini
         let DefaultEngineIniPath = path.join( gameInstallationDirectory, "HawkenGame", "Config", "DefaultEngine.ini" );
@@ -618,9 +702,28 @@ class LauncherCore {
         if ( !fs.existsSync(this.iniPath) || fs.readdirSync(this.iniPath).length === 0 ) {
             console.log("HUHd")
             fs.mkdirSync(this.iniPath,{ recursive: true });
-            this.showPage( "loading", { progress: 0.2, loadingText: "Performing first time setup" } );
-            await this.patchManager.generateUserInis();
+            this.showPage( "loading", { progress: 0.2, loadingText: "Performing first time setup. (This might take a up to a minute)" } );
+            
+            try {
 
+                let setupResult = await this.patchManager.generateUserInis();
+                console.log("[SETUPRESULT]: "+setupResult)
+
+            } catch( errorCode ) {
+
+                let installError = {
+                    errorHeading: "Failed to run game for the first time: ",
+                    errorMessage: "Setup exited with exit code "+errorCode
+                }
+
+                if ( errorCode == "3221225781" ) {
+                    installError.errorHeading = "UE3Redist not installed.";
+                    installError.errorMessage = "Please run Binaries/Redist/UE3Redist.exe and restart the launcher."
+                }
+
+                return this.showPage( "error", installError );
+            }
+            
         }
 
         this.showPage( "loading", { progress: 0.2, loadingText: "Patching systems." } );
@@ -654,9 +757,6 @@ class LauncherCore {
             errorMessage: "Reinstall the launcher."
         }
 
-        // this.remoteConfiguration.data = null;
-        // remoteConfigError =" ET"
-        
         if ( remoteConfigError ) {
 
             console.log("ERROR OBTAINING REMOTE CONFIG")
@@ -737,6 +837,7 @@ class LauncherCore {
 
         // Load menu after dispatching state
         this.showPage("menu");
+        //this.showPage("welcome");
         
         // Schedule regular remote update intervals
         if ( !this.isOffline() ) this.remoteRefreshInterval = setInterval( () => { this.updateRemoteConfigs() }, this.launcherState.update_interval );

@@ -10,15 +10,9 @@ const Topbar = () => {
 
    const LauncherState = useContext( LauncherContext );
 
-
-    function MDlinkRenderer( props ){
-        console.log(props)
-        return <a href={props.href} tabIndex="-1">{props.children}</a>
-    }
-      
     return (
 
-        <div className="menu_topBar">
+        <div className="menu_topBar nohighlight">
 
             
             <div id="mainlogocontainer">

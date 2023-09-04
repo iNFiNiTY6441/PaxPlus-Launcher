@@ -8,6 +8,10 @@
                             supported by Chrome, Edge, Opera and Firefox */
 }
 
+.highlight {
+    user-select: auto;
+}
+
 @font-face {
 font-family: Kremlin;
 font-weight: 400;
@@ -208,13 +212,6 @@ input[type="color"]::-webkit-color-swatch {
     opacity: 0.85;
 }
 
-#mainlogo {
-    background-image: url("/src/resources/img/hwkn.png");
-    background-size: cover;
-    width: 200px;
-    height: 80px;
-    z-index: 2;
-}
 
 #background {
     position: absolute;
@@ -546,6 +543,7 @@ option :hover {
 
 a {
     color: #9df2f5;
+    text-decoration: "none";
 }
 
 button, .fileUpload {
@@ -790,7 +788,7 @@ color: #D7EFF0;
     height: 520px;
     left:370px;
     top:132px;
-
+    overflow-x:hidden;
     border: 1px solid #465657;
 
     /* opacity: 0.75; */
@@ -803,6 +801,7 @@ color: #D7EFF0;
     border: solid 0.5px #738285;
     border: solid 0.5px #4b5457;
     margin-top: -1.0px;
+    overflow-x:hidden;
 }
 
 .pagewindow h1 {
@@ -1485,17 +1484,6 @@ background-image: url("/src/resources/img/icon_exit.png");
     100% { opacity:.9; }
 }
 
-/** BACKPORTS **/
-
-.nohighlight {
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-        -khtml-user-select: none; /* Konqueror HTML */
-        -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
-}
-
 ::selection {
     color: #14191B;
     background-color: #36a0ac;
@@ -1545,7 +1533,7 @@ background-image: url("/src/resources/img/icon_exit.png");
 a {
     position: relative;
     color: #9df2f5;
-
+    text-decoration: "none";
     transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
@@ -1752,6 +1740,89 @@ a:not(.normalButton):hover{
     margin-bottom: 30px;
 }
 
+#section_credits {
+
+    overflow: auto;
+
+    width: auto;
+    height: 340px;
+    
+}
+
+.grid {
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+
+    margin: 20px;
+    margin-top: 0;
+}
+
+.grid div {
+
+    margin: 0px;
+    padding: 0;
+    padding-left: 10px;
+    font-size: 16px;
+    color: #b4d0d1;
+
+}
+
+.grid div a{
+
+
+    font-size: 20px;
+    text-decoration: none;
+}
+
+.grid_divider {
+
+    grid-column: 1 / -1;
+    padding: 0;
+    margin: 0;
+    margin-top: 0px;
+    /* border-bottom: 1px solid #465657; */
+    height: 45px;
+}
+
+.grid_divider p {
+
+    margin: 0;
+    margin-right: 20px;
+    margin-top: 20px;
+    padding: 0;
+    margin-left: -10px;
+    padding-left: -10px;
+    border-bottom: 1px solid #465657;
+}
+
+#grid_contact {
+    
+    margin-top: 18px;
+    width: 1000px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+#grid_contact a {
+    font-size: 18px;
+}
+
+#grid_credits {
+    
+    width: 720px;
+    height: 200px;
+    
+}
+
+#credits_divider_dev {
+    grid-column: 1 / -1;
+
+    margin-top: -20px;
+    height: 40px;
+}
+
 /**Play Menu: Gamemode tab container **/
 #play_categories {
     display: flex; 
@@ -1808,12 +1879,17 @@ button.triggered {
 ////////////// PAGE: LEGAL ///////////////
 **/
 
+#page_legal {
+    overflow-x:hidden;
+}
+
 #page_legal .pagewindow {
     
     background-color: #1217194d; 
     border: none; 
     margin-top: 0px;
     margin-bottom: 0px;
+    overflow-x:hidden;
 }
 
 #page_legal .pagewindow p {
