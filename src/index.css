@@ -762,6 +762,8 @@ color: #D7EFF0;
     background-image: linear-gradient(-45deg, #7585866c 0.98%, #1d262600 0.98%, #1d262600 50%, #7585866c 50%, #7585866c 50.98%, #1d262600 50.98%, #15191900 100%);
     background-size: 72.12px 72.12px;
     background-size: 11.84px 11.84px;
+
+    overflow: hidden;
 }
 
 .darkButton {
@@ -1306,12 +1308,13 @@ background-image: url("/src/resources/img/icon_exit.png");
     margin: 0;
 }
 .pageCategory.edgeDots:before,  .pageCategory.edgeDots:after {
-    z-index: 2000;
+    z-index: 2500;
     font-size: 16px;
 }
 .pagewindow h1.edgeDots:before,  .pagewindow h1.edgeDots:after {
     font-size: 11.2px;
     font-size: 8.2px;
+    z-index: 2500;
 }
 
 .statusBarContainer {
@@ -1458,15 +1461,17 @@ background-image: url("/src/resources/img/icon_exit.png");
     width: 2.1px;
     height: 2.1px;
     box-shadow: 0 2.08lh 0 0 #D9FFFF;
-    z-index: 1500;
+    z-index: 2500;
 }
 .edgeDots:before {
     left: -1.8px;
     top: -2.5px;
+    z-index: 2500;
 }
 .edgeDots:after {
     right: -1.8px;
     top: -2.5px;
+    z-index: 2500;
 }
 
 @keyframes text-flicker {
@@ -1745,7 +1750,7 @@ a:not(.normalButton):hover{
     overflow: auto;
 
     width: auto;
-    height: 340px;
+    height: 380px;
     
 }
 

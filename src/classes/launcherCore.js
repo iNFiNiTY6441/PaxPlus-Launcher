@@ -1,18 +1,20 @@
 const { ipcMain, dialog } = require('electron');
+const { v4: uuidv4 } = require('uuid');
 
 const path = require('path');
-const axios = require('axios');
 const fs = require('fs');
 
+// Launcher classes
 const ConfigManager = require('./configManager.js');
 const RemoteDataManager = require('./remoteDataManager.js');
 const IniFilePatcher = require('./iniFilePatcher.js');
 const PatchManager = require('./patchManager.js');
 
+// Default launcher state object
 const { DefaultState } = require("../app/defaultLauncherState.js");
 
-const { v4: uuidv4 } = require('uuid');
-
+// Launcher attributes
+const LAUNCHER_DEFAULT_ENDPOINT = "https://infinity6441.github.io/PaxPlus-Launcher-Remote";//"http://78.47.65.130:281";
 const LAUNCHER_VERSION = "0.9.5";
 const LAUNCHER_UNIQUEID = uuidv4();
 
@@ -22,10 +24,13 @@ const LAUNCHER_HEADERS = {
     LauncherVersion: LAUNCHER_VERSION,
 }
 
+const LAUNCHER_OFFLINEPOLLINGRATE = 5000;
+
+// Color conversion util
 const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
     const hex = x.toString(16)
     return hex.length === 1 ? '0' + hex : hex
-}).join('')
+}).join('');
 
 /**
  * Main launcher backend class
@@ -33,36 +38,42 @@ const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
  */
 class LauncherCore {
 
+    /**
+     * Creates a new launcher core class instance, there should only ever be one at any given time.
+     * 
+     * @param {*} mainWindow Main electron application window for the launcher
+     */
 
-    constructor( remoteConfigBaseURL, mainWindow ) {
+    constructor( mainWindow ) {
 
         // Main electron window of the launcher
         this.mainWindow = mainWindow;
 
+        // Set initial state
+        this.launcherState = DefaultState
+        this.launcherState.version_launcher = LAUNCHER_VERSION;
+
         // Base URL to get all remote config & patch data from
-        this.configEndpoint = remoteConfigBaseURL;
-        //this.configEndpoint = "http://localhost:8090/"
+        this.configEndpoint = LAUNCHER_DEFAULT_ENDPOINT;
 
         // Launcher local config / working dir
         this.localStoragePath = path.join(process.env.USERPROFILE, 'Documents','PAXPlus_Launcher');
 
         // Game INI path
-        this.iniPath = path.join(process.env.USERPROFILE, 'Documents', 'My Games', 'Hawken', 'HawkenGame', 'Config');
+        this.iniPath = path.join(process.env.USERPROFILE, 'Documents', 'My Games', 'Hawken_PAXPlus', 'HawkenGame', 'Config');
 
         // User config manager
         this.configManager = null;
 
-        // Currently loaded game patch data / data manager
+        // Remote data instances
+        this.remoteConfiguration = null;
         this.patchData = null;
         this.serverData = null;
 
+        // Interval to refresh the remote data with
         this.remoteRefreshInterval = null;
 
-        this.launcherState = DefaultState
-        this.launcherState.version_launcher = LAUNCHER_VERSION;
-
-        
-        
+        // Register IPC Handlers for renderer interaction
         this.registerHandlers();
     }
 
@@ -164,8 +175,14 @@ class LauncherCore {
      * Updates the global launcher state in the renderer process
      */
     pushLauncherStateUpdate(){
-        console.log("     |- [STATE]: Pushed to renderer.")
-        console.log(""),
+
+        if ( !this.mainWindow || !this.mainWindow.webContents ) {
+
+            throw new Error("[CORE][pushLauncherStateUpdate]: FATAL: mainWindow not loaded.");
+        }
+
+        console.log("     |- [STATE]: Pushed to renderer.\r\n")
+
         this.mainWindow.webContents.send('LauncherStateUpdate', this.launcherState );
     }
 
@@ -186,7 +203,7 @@ class LauncherCore {
         // Things are very very wrong
         if ( !this.remoteConfiguration ) {
 
-            throw new Error("[CORE][getVersionSupportStatus]: LauncherCore fatal: Missing core data: remoteConfiguration");
+            throw new Error("[CORE][getVersionSupportStatus]: FATAL: Missing core data: remoteConfiguration");
         }
 
         // No remote data was ever retrieved 
@@ -204,54 +221,111 @@ class LauncherCore {
         return this.getVersionSupportStatus( version ) != 'eol';
     }
 
+    /**
+     * Handles the change of the remote config data. 
+     * Will update critical launcher state values according to new remote config data.
+     * Dispatches updated launcher state to the renderer.
+     * 
+     * @param {Object} configData Object with new config data
+     */
+
     async onRemoteConfigUpdate( configData ) {
 
-        //if ( this.isOffline() ) return;
-        console.log("[UPDATE_REMOTE]: Remote configuration updated");
-    
+        // Invalid call guard
+        if ( !configData || typeof configData != 'object' ) {
+
+            throw new Error("[UPDATE_REMOTE][CONFIG]: ERROR: Function called without new data object.");
+        }
+        
+        // Update launcher news
         this.launcherState.news = configData.news;
 
         let support = 'eol';
         if ( configData.versions.latest === LAUNCHER_VERSION ) support = 'latest';
         if ( configData.versions.supported.indexOf( LAUNCHER_VERSION ) >= 0 ) support = 'support';
+
+        // Update support status
         this.launcherState.support_status = support;
 
+        // Set offline mode & disable further remote fetching on end of life launchers
         if ( support === 'eol' ) {
+
             this.launcherState.network_mode = 1;
             clearInterval( this.remoteRefreshInterval );
         }
 
-        if ( configData.update_interval !== this.launcherState.update_interval ) {
-            
+        // Update data fetching interval to match the preferred remote setting
+        if ( configData.update_interval != this.launcherState.update_interval ) {
+
+            console.log("[UPDATE_REMOTE][CONFIG]: Changing refresh interval from "+this.launcherState.update_interval+" to "+configData.update_interval );
             this.launcherState.update_interval = configData.update_interval;
+
             clearInterval( this.remoteRefreshInterval );
             this.remoteRefreshInterval = setInterval( () => { this.updateRemoteConfigs() }, configData.update_interval );
         }
 
+        // Push state to renderer
         this.pushLauncherStateUpdate();
-    }
-
-    async onRemotePatchUpdate( newPatchData ) {
-
-       // if ( this.isOffline() ) return;
-        console.log("[UPDATE_REMOTE]: Gamepatch updated");
-
-        this.launcherState.version_patch = newPatchData.meta.version;
-        this.pushLauncherStateUpdate();
-    }
-
-    async onRemoteSettingsUpdate( newSettingsData ) {
-
-        //if ( this.isOffline() ) return;
-        console.log("[UPDATE_REMOTE]: Settings updated");
-        this.launcherState.settings_layout = newSettingsData;
-        this.pushLauncherStateUpdate();
+        console.log("[UPDATE_REMOTE][CONFIG]: Remote configuration updated");
     }
 
     /**
-     * Updates the remote data endpoints
+     * Handles the change of the remote patch data
+     * Will update critical launcher state values according to new remote config data.
+     * Dispatches updated launcher state to the renderer.
+     * 
+     * @param {Object} newPatchData Object containing the new patch package data
      */
+
+    async onRemotePatchUpdate( newPatchData ) {
+
+        // Invalid call guard
+        if ( !newPatchData || typeof newPatchData != 'object' ) {
+
+            throw new Error("[UPDATE_REMOTE][PATCH]: ERROR: Function called without new data object.");
+        }
+
+        // Update patch version
+        this.launcherState.version_patch = newPatchData.meta.version;
+
+        // Push state to renderer
+        this.pushLauncherStateUpdate();
+        console.log("[UPDATE_REMOTE][PATCH]: Updated to patch "+this.launcherState.version_patch);
+    }
+
+    /**
+     * Handles the change of the remote settings page layout data.
+     * Will update critical launcher state values according to new remote config data.
+     * Dispatches updated launcher state to the renderer.
+     * 
+     * @param {Object} newSettingsData Object containing the new settings page config
+     */
+
+    async onRemoteSettingsUpdate( newSettingsData ) {
+
+        // Invalid call guard
+        if ( !newSettingsData || typeof newSettingsData != 'object' ) {
+
+            throw new Error("[UPDATE_REMOTE][SETTINGS]: ERROR: Function called without new data object.");
+        }
+
+        // Update launcher settings page layout state
+        this.launcherState.settings_layout = newSettingsData;
+
+        // Push state to renderer
+        this.pushLauncherStateUpdate();
+        console.log("[UPDATE_REMOTE][SETTINGS]: Remote settings data updated");
+    }
+
+    /**
+     * Fetches & updates all remote launcher data: Launcher config, Settings page config & Game patch package.
+     * Will temporarily set launcher into offline mode by changing the network mode & keeping the remote update interval going.
+     */
+
     async updateRemoteConfigs() {
+
+        console.log("remoteupdate");
+        console.log(this.launcherState.update_interval)
 
         // Things are very very wrong
         if ( !this.patchData || !this.settingsData || !this.remoteConfiguration ) {
@@ -271,66 +345,154 @@ class LauncherCore {
                 console.log("[CORE][updateRemoteConfigs]: GOING ONLINE: Masterserver connection restored.");
                 this.launcherState.network_mode = 0;
                 this.launcherState.support_status = this.getVersionSupportStatus();
+                this.launcherState.update_interval = this.remoteConfiguration.update_interval;
+
+                // Change to high remote data polling, to speed up reconnection
+                clearInterval( this.remoteRefreshInterval );
+                this.remoteRefreshInterval = setInterval( () => { this.updateRemoteConfigs() }, this.remoteConfiguration.update_interval );
+
                 this.pushLauncherStateUpdate();
             }
 
             // Failed to fetch on remoteConfig / failed to fetch settings or patch data with no local fallback available
         } catch ( remoteConfigRetrievalError ) {
             
-            // Set launcher into offline mode BUT DON'T CLEAR THE REFRESH INTERVAL - this allows reconnect attempt on next interval fire
+            // Set launcher into offline mode 
             console.log("[CORE][updateRemoteConfigs]: GOING OFFLINE: Failed retrieving remote launcher config.");
             this.launcherState.network_mode = -1;
             this.launcherState.support_status = 'offline'
+            this.launcherState.update_interval = LAUNCHER_OFFLINEPOLLINGRATE;
+
+            // Change to high remote data polling, to speed up reconnection
+            clearInterval( this.remoteRefreshInterval );
+            this.remoteRefreshInterval = setInterval( () => { this.updateRemoteConfigs() }, LAUNCHER_OFFLINEPOLLINGRATE );
+
+            // Push to renderer
+            this.pushLauncherStateUpdate();
         }
-        
 
     }
 
+    /**
+     * Fetches the current launcher userConfig containing all user & launcher specific settings
+     * @returns Launcher userConfig object
+     */
+
     async getUserConfig() {
 
-        if ( !this.configManager ) throw new Error("[getUserConfig]: FATAL! configManager not initialized.");
-        if ( !this.configManager.config ) throw new Error("[getUserConfig]: FATAL! configManager has no config loaded.");
+        // Called without manager init
+        if ( !this.configManager ) {
+
+            throw new Error("[getUserConfig]: FATAL! configManager not initialized.");
+        }
+
+        // No config present, not even default template: Something is severely wrong
+        if ( !this.configManager.config ) {
+
+            throw new Error("[getUserConfig]: FATAL! configManager has no config loaded.");
+        }
 
         return this.configManager.config;
     }
 
+    /**
+     * Returns the value for a specific key under the specified section in the launchers userConfig.
+     * 
+     * @param {String} category userConfig section of the key
+     * @param {String} option userConfig key in the section
+     * @returns Value of the given key in the specified section
+     */
+
     async getUserConfigValue( category, option ) {
 
-        if ( !this.configManager ) throw new Error("[getUserConfigValue]: FATAL! configManager not initialized.");
+        // Called without manager init
+        if ( !this.configManager ) {
+
+            throw new Error("[getUserConfigValue]: FATAL! configManager not initialized.");
+        }
 
         return this.configManager.getOption( category, option );
     }
 
+    /**
+     * Sets the value for a specific key in a specified section of the launchers userConfig
+     * 
+     * @param {String} category userConfig section of the key
+     * @param {String} option userConfig key to set the value of
+     * @param {*} value Value to set
+     */
+
     async setUserConfigValue( category, option, value ) {
 
-        if ( !this.configManager ) throw new Error("[setUserConfigValue]: FATAL! configManager not initialized.");
+        // Called without manager init
+        if ( !this.configManager ) {
+            
+            throw new Error("[setUserConfigValue]: FATAL! configManager not initialized.");
+        }
 
         return this.configManager.setOption( category, option, value );
     }
+
+    /**
+     * Deletes a specific key-value pair in a given section of the launcher userConfig
+     * 
+     * @param {String} category 
+     * @param {String} option 
+     */
 
     async deleteUserConfigValue( category, option) {
 
-        if ( !this.configManager ) throw new Error("[setUserConfigValue]: FATAL! configManager not initialized.");
+        // Called without manager init
+        if ( !this.configManager ) {
 
-        return this.configManager.setOption( category, option, value );
+            throw new Error("[setUserConfigValue]: FATAL! configManager not initialized.");
+        }
+
+        return this.configManager.deleteOption( category, option );
     }
+
+    /**
+     * Get the currently loaded patch version
+     * @returns Version string of the patch
+     */
 
     async getPatchVersion() {
 
-        let version = "";
+        if ( !this.patchData ) {
 
-        if ( !this.patchData ) throw new Error("[getPatchVersion]: FATAL! patchData not initialized.");
-        if ( !this.patchData.data ) throw new Error("[getPatchVersion]: FATAL! No patch data loaded.");
+            throw new Error("[getPatchVersion]: FATAL! patchData not initialized.");
+        }
 
-        if ( this.patchData.data.meta && this.patchData.data.meta.version ) version = this.patchData.data.meta.version;
+        if ( !this.patchData.data ) {
 
-        return version;
+            throw new Error("[getPatchVersion]: FATAL! No patch data loaded.");
+        }
+
+        // If a patch is loaded
+        if ( this.patchData.data.meta && this.patchData.data.meta.version ) {
+
+            return this.patchData.data.meta.version;
+        } 
+
+        // No loaded patch
+        return "";
     }
 
-    async getServers( getFresh = false ) {
+    /**
+     * Fetches the current server listings data from the remote server list endpoint
+     * @returns Server listings object
+     */
+
+    async getServers() {
+
+        // Called without manager init
+        if ( !this.serverData ) {
+
+            throw new Error("[getServers]: FATAL! serverData not initialized.");
+        }
 
         console.log("\r\n============ Core: GetServers =============");
-        console.log("[GetServers]: Fresh? %s", getFresh );
+        console.log("[GetServers]: Fetching listings...");
 
         try {
 
@@ -338,25 +500,47 @@ class LauncherCore {
             await this.serverData.loadRemote();
             console.log("[GetServers]: Got %s servers", Object.keys( this.serverData.data ).length );
 
-        } catch ( serverRefreshError ) {
+        } catch ( serverRefreshError ) { // Failed fetching server list data
 
+            console.log("[GetServers]: ERROR: Failed retrieving server list data");
+
+            // Return to the main menu instead of the play screen to prevent a potential infinite fail loop
             this.showPage( "menu/error", { 
                 errorHeading: `Failed fetching server list.`, 
                 errorMessage: serverRefreshError.message, 
                 actionName:"OK", 
                 actionURL: "/menu" 
             });
+
         }
-       
+        
         return this.serverData.data;
     }
 
+    /**
+     * Fetches the game settings page layout & value configuration object from the remote data endpoint.
+     * @returns Settings page configuration object
+     */
+
     async getGameSettingsBaseConfig() {
 
-        console.log("\r\n=========== GetGameSettingsBase ===========")
-        if ( !this.settingsData ) throw new Error("[getGameSettingsBaseConfig]: FATAL! settingsData not initialized.");
+        if ( !this.settingsData ) {
+
+            throw new Error("[getGameSettingsBaseConfig]: FATAL! settingsData not initialized.");
+        }
+
+        console.log("\r\n=========== GetGameSettingsBase ===========");
         return this.settingsData.data;
     }
+
+    /**
+     * Fetches the currently set value for an option in the settings page config object.
+     * Will try retrieving the data from the launcher userConfig first, but will fall back to the correct ini file otherwise.
+     * 
+     * @param {String} optionCategoryName Settings page config section of the option
+     * @param {String} optionCfgName Key name of the option in the settings page config
+     * @returns Currently set value for the game option
+     */
 
     getGameSetting( optionCategoryName, optionCfgName ) {
 
@@ -461,12 +645,14 @@ class LauncherCore {
 
                     let rgbValues = [];
 
+                    // Convert from RGB% of 255 to R,G,B float values
                     for ( const k in setting.ini.key ) {
 
                         let iniColorPercent = iniLoader.getValue( setting.ini.section, setting.ini.key[k] );
                         let colorValue = Math.floor( ( iniColorPercent / 100 ) * 255 )
                         rgbValues.push( colorValue );
                     }
+                    // Convert RGB float values to hex for passing to the color swatch component
                     value = rgbToHex( ...rgbValues );
                     break;
             }
@@ -478,17 +664,42 @@ class LauncherCore {
         return value;
     }
 
+    /**
+     * Sets a game option in the launchers userConfig to the given value
+     * @param {String} key Key name to set the option value under
+     * @param {*} value Value to set the userConfig key to
+     */
+
     setGameSetting( key, value ) {
 
-        if ( !this.configManager ) throw new Error("[setGameSetting]: FATAL! configManager not initialized.");
-        if ( !this.configManager.config ) throw new Error("[setGameSetting]: FATAL! configManager has no config loaded.");
+        // Called without manager init
+        if ( !this.configManager ) {
+
+            throw new Error("[setGameSetting]: FATAL! configManager not initialized.");
+        }
+        if ( !this.configManager.config ) {
+
+            throw new Error("[setGameSetting]: FATAL! configManager has no config loaded.");
+        }
+
         return this.configManager.setOption( "game", key, value );
     }
 
+    /**
+     * Saves current in-memory user configuration to the userConfig file
+     */
+
     saveGameSettings() {
 
-        if ( !this.configManager ) throw new Error("[saveGameSettings]: FATAL! configManager not initialized.");
-        if ( !this.configManager.config ) throw new Error("[saveGameSettings]: FATAL! configManager has no config loaded.");
+        // Called without manager init
+        if ( !this.configManager ) {
+
+            throw new Error("[saveGameSettings]: FATAL! configManager not initialized.");
+        }
+        if ( !this.configManager.config ) {
+
+            throw new Error("[saveGameSettings]: FATAL! configManager has no config loaded.");
+        }
 
         console.log("//////////// SaveGameSettings /////////////")
         return this.configManager.saveConfig()
@@ -510,7 +721,13 @@ class LauncherCore {
         if ( queryParameters ) queryString = Object.keys(queryParameters).map(key => key + '=' + queryParameters[key]).join('&');
 
         this.mainWindow.loadURL( MAIN_WINDOW_WEBPACK_ENTRY+"#/"+page+"?"+queryString);
-    }    
+    }
+
+    /**
+     * Patch the game if needed & launch
+     * 
+     * @param {String} serverIP (Optional) Server IP to connect to after game start
+     */
 
     async launchGame( serverIP ) {
 
@@ -645,10 +862,23 @@ class LauncherCore {
         
     }
 
+    /**
+     * Callback handler for when the first time setup experience exits
+     * Maybe do more things here later...
+     */
+
     async finishSetup(){
         
+        // Proceed to next init step
         await this.init_1();
     }
+
+    /**
+     * Launcher initialization: First stage
+     * Loads the launcher userConfig & decides to either proceed or boot into the first time setup experience.
+     * Will also reset userConfig if corrupt.
+     * @returns Launcher state object after the initial boot stage
+     */
 
     async init_0() {
 
@@ -694,6 +924,11 @@ class LauncherCore {
         return this.launcherState;
     }
 
+    /**
+     * Launcher initialization: Second stage
+     * Patches DefaultEngine.ini to always point to the custom "Hawken_PAXPlus" Documents ini folder to prevent collisions with other hawken clients
+     * Generates game ini files by silently running the game in server mode & will trigger the UE3Redist setup if the user is missing redistributables to run the game
+     */
     async init_1() {
 
         // Basic init
@@ -803,6 +1038,13 @@ class LauncherCore {
 
     }
 
+    /**
+     * Launcher initialization: Final Stage
+     * Sets main launcher operating mode based on internet connectivity, locally saved data & version lifecycle status
+     * Attempts to load the freshest settings, gamePatch & config data from the remote endpoint if available.
+     * Attempts to load patch & settings data from locally saved copies, if offline
+     */
+
     async init_2() {
 
         console.log("\r\n============ Core: INIT-2 =============");
@@ -909,13 +1151,16 @@ class LauncherCore {
 
         // Load menu after dispatching state
         this.showPage("menu");
-        //this.showPage("welcome");
         
         // Schedule regular remote update intervals
-        if ( !this.isOffline() ) this.remoteRefreshInterval = setInterval( () => { this.updateRemoteConfigs() }, this.launcherState.update_interval );
+        if ( !this.isOffline() ) {
 
+            if ( !this.remoteRefreshInterval ) {
 
-        //this.showPage("welcome");
+                this.remoteRefreshInterval = setInterval( () => { this.updateRemoteConfigs() }, this.launcherState.update_interval );
+            }
+
+        }
     }
 
 }

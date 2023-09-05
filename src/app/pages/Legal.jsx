@@ -94,6 +94,18 @@ function About() {
                 </div>
 
                 <div>
+                    <a tabIndex="-1" href="https://discord.com/users/165718904453201920" title="open link">BadPixel</a>
+                </div>
+
+                <div>
+                    <a tabIndex="-1" href="https://discord.com/users/65471968048054272" title="open link">Orillion</a>
+                </div>
+
+                <div>
+                    <a tabIndex="-1" href="https://discord.com/users/88382040772218880" title="open link">Tom Neverwinter</a>
+                </div>
+
+                <div>
                     <a tabIndex="-1" href="https://www.example.com" title="open link">Tester Slot</a>
                 </div>
 

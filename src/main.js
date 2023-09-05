@@ -2,8 +2,6 @@ const { app, BrowserWindow, globalShortcut } = require('electron');
 
 const LauncherCore = require('./classes/launcherCore.js');
 
-const remoteDataEndpoint = "http://78.47.65.130:281"//"https://infinity6441.github.io/PaxPlus-Launcher-Remote";
-
 var LAUNCHER_CORE = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -69,7 +67,7 @@ app.on('ready', async function(){
 
   try {
 
-    LAUNCHER_CORE = new LauncherCore( remoteDataEndpoint, mainWindow );
+    LAUNCHER_CORE = new LauncherCore( mainWindow );
     LAUNCHER_CORE.showPage( "loading", { progress: 0.0, loadingText: "Starting core functions." } );
   } catch ( error ) {
 

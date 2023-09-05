@@ -68,6 +68,21 @@ class ConfigManager {
     }
 
     /**
+     * 
+     * @param {*} category 
+     * @param {*} option 
+     */
+    deleteOption(category, option) {
+        
+        if ( this.config[category][option] ) {
+
+            delete this.config[category][option]
+            this.saveConfig();
+        }
+        
+    }
+
+    /**
      * Gets an option from the configuration.
      * @param {string} category - The category of the option.
      * @param {string} option - The name of the option.
