@@ -4,7 +4,7 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
 
-const UPK_PATCH_TOOL= "./PatchUPK.exe";
+const UPK_PATCH_TOOL= "./dist/PatchUPK.exe";
 
 class upkFilePatcher {
 
@@ -51,7 +51,7 @@ class upkFilePatcher {
         let patchCommand = `${patcherTool} "${patchFilePath}" "${upkDirectory}"`
     
         let output = await exec(patchCommand, { cwd: patcherDirectory } ).catch( err => { 
-            
+            console.log(err)
             if ( err.code == "3221225781" ) {
 
                 throw new Error("UE3 Redistributables are not installed. Please run Binaries/Redist/UE3Redist.exe ")

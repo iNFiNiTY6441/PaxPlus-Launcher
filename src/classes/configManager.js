@@ -2,7 +2,7 @@ const { assert } = require('console');
 const fs = require('fs');
 const path = require('path');
  
-const DEFAULT_CONFIG_PATH = __dirname + "\\" +require('/src/resources/defaultConfig.json');//"/src/resources/defaultConfig.json";//'../resources/defaultConfig.json';
+const DEFAULT_CONFIG_PATH = __dirname + "\\" +require('/src/resources/config/defaultConfig.json');//"/src/resources/defaultConfig.json";//'../resources/defaultConfig.json';
 /**
  * A class representing a configuration manager.
  */

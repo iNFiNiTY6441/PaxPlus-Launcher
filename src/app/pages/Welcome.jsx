@@ -8,7 +8,7 @@ function Welcome() {
     const navigate = useNavigate();
 
     const [gamePath, setGamePath] = useState("No folder selected.");
-    const [documentsPath, setDocumentsPath] = useState("Use default.");
+    const [documentsPath, setDocumentsPath] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
     const [canProceed, setCanProceed] = useState(false);
 
@@ -53,7 +53,7 @@ function Welcome() {
 
     function resetDocumentsPath(){
 
-        setDocumentsPath("Use default.");
+        
     }
 
     function nextPage(){
@@ -123,7 +123,7 @@ function Welcome() {
 
             { page == 2 &&
                         
-                <Dialog dialogTitle="OPTIONAL - DOCUMENTS FOLDER" rightButtonName="CONTINUE" rightButtonFunction={nextPage} rightButtonEnabled={!canProceed}>
+                <Dialog dialogTitle="OPTIONAL - DOCUMENTS FOLDER" rightButtonName={documentsPath ? "CONTINUE" : "SKIP"} rightButtonFunction={nextPage} rightButtonEnabled={!canProceed}>
 
                     Some users may have moved their default <strong>Windows 'Documents' folder</strong><br/>onto another disk or into another folder.<br/><br/>
                     <strong className='textColor_yellow'>If your 'Documents' folder is in a custom location, please select it below: </strong>
@@ -136,7 +136,7 @@ function Welcome() {
                         <tbody>
                         <tr>
 
-                            <td style={{width: "435px", textAlign: "left", paddingLeft: "20px", fontSize: "13px"}}> { documentsPath} </td>
+                            <td style={{width: "435px", textAlign: "left", paddingLeft: "20px", fontSize: "13px"}}> { documentsPath ? documentsPath : "Use Default." } </td>
 
                             <td className="edgeDots" style={{width: "90px", fontSize: "15px"}}>
                                 <button tabIndex="-1" type="file" id="btn_exeFile" onClick={updateDocumentsPath}>Change</button>
@@ -144,7 +144,7 @@ function Welcome() {
                             </td>
 
                             <td className="edgeDots" style={{width: "90px", fontSize: "15px"}}>
-                                <button tabIndex="-1" id="btn_exeFile" onClick={ resetDocumentsPath }>Reset</button>
+                                <button tabIndex="-1" id="btn_exeFile" onClick={ () => setDocumentsPath(null)  }>Reset</button>
                                 <input type="file" id="input_exeFile"hidden/>
                             </td>
 

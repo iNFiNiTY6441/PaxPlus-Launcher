@@ -14,8 +14,8 @@ const PatchManager = require('./patchManager.js');
 const { DefaultState } = require("../app/defaultLauncherState.js");
 
 // Launcher attributes
-const LAUNCHER_DEFAULT_ENDPOINT = "https://infinity6441.github.io/PaxPlus-Launcher-Remote";//"http://78.47.65.130:281";
-const LAUNCHER_VERSION = "0.9.5";
+const LAUNCHER_DEFAULT_ENDPOINT = "http://78.47.65.130:281";//"https://infinity6441.github.io/PaxPlus-Launcher-Remote";//
+const LAUNCHER_VERSION = "1.0.0";//"0.9.5";
 const LAUNCHER_UNIQUEID = uuidv4();
 
 const LAUNCHER_HEADERS = {
@@ -345,11 +345,11 @@ class LauncherCore {
                 console.log("[CORE][updateRemoteConfigs]: GOING ONLINE: Masterserver connection restored.");
                 this.launcherState.network_mode = 0;
                 this.launcherState.support_status = this.getVersionSupportStatus();
-                this.launcherState.update_interval = this.remoteConfiguration.update_interval;
+                this.launcherState.update_interval = this.remoteConfiguration.data.update_interval || LAUNCHER_OFFLINEPOLLINGRATE;
 
                 // Change to high remote data polling, to speed up reconnection
                 clearInterval( this.remoteRefreshInterval );
-                this.remoteRefreshInterval = setInterval( () => { this.updateRemoteConfigs() }, this.remoteConfiguration.update_interval );
+                this.remoteRefreshInterval = setInterval( () => { this.updateRemoteConfigs() }, this.launcherState.update_interval );
 
                 this.pushLauncherStateUpdate();
             }
@@ -770,6 +770,7 @@ class LauncherCore {
         }
 
         this.patchManager.setGamePath( gameInstallationDirectory );
+        this.patchManager.setIniPath( this.iniPath );
 
         // UPDATE & SET PATCH DATA
         this.showPage( "menu/loading", { progress: 0.2, loadingText: "Loading patch data" } );
@@ -959,7 +960,7 @@ class LauncherCore {
         console.log(this.iniPath)
         // IniFolder is empty
         if ( !fs.existsSync(this.iniPath) || fs.readdirSync(this.iniPath).length === 0 ) {
-            console.log("HUHd")
+
             fs.mkdirSync(this.iniPath,{ recursive: true });
             this.showPage( "loading", { progress: 0.2, loadingText: "Performing first time setup. (This might take a up to a minute)" } );
             

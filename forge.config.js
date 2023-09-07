@@ -1,7 +1,18 @@
+const path = require('path');
+const fs = require('fs');
+
 module.exports = {
   packagerConfig: {
 
      icon: './src/resources/img/paxlauncher.ico'
+
+      // extraResource: [
+      //   "./dist/decompress.exe",
+      //   "./dist/decompress.exe_LICENSE.txt",
+      //   "./dist/PatchUPK.exe",
+      //   "./dist/PatchUPK.exe_LICENSE.txt",
+      //   "./dist/UPKUtils-SRC.zip"
+      //  ]
   },
   rebuildConfig: {},
   makers: [
@@ -9,7 +20,7 @@ module.exports = {
       name: '@electron-forge/maker-squirrel',
       config: {
         // An URL to an ICO file to use as the application icon (displayed in Control Panel > Programs and Features).
-        icon: './src/resources/img/paxlauncher.ico',
+        //icon: './src/resources/img/paxlauncher.ico',
         // The ICO file to use as the icon for the generated Setup.exe
         setupIcon: './src/resources/img/paxlauncher.ico',
       },
@@ -27,6 +38,15 @@ module.exports = {
       config: {},
     },
   ],
+
+  hooks: {
+    packageAfterCopy: async (config, buildPath, electronVersion, platform, arch) => {
+      var src = path.join(__dirname, './dist');
+      var dst = buildPath;
+      fs.cpSync(src, dst, {recursive: true});
+    }
+  },
+
   plugins: [
     {
       name: '@electron-forge/plugin-webpack',

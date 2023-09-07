@@ -6,6 +6,13 @@
     -ms-user-select: none; /* Internet Explorer/Edge */
         user-select: none; /* Non-prefixed version, currently
                             supported by Chrome, Edge, Opera and Firefox */
+                            
+}
+
+*, *::after, *::before {
+	-webkit-user-select: none;
+	-webkit-user-drag: none;
+	-webkit-app-region: no-drag;
 }
 
 .highlight {

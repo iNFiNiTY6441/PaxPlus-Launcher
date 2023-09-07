@@ -11,7 +11,7 @@ function Configure() {
     //const [settingsData, setSettingsData] = useState({});
 
     const [gamePath, setGamePath] = useState(null);
-    const [documentsPath, setDocumentsPath] = useState("Use default.");
+    const [documentsPath, setDocumentsPath] = useState(null);
 
     const gamePath_InputRef = useRef(null);
     const documentsPath_InputRef = useRef(null);
@@ -90,7 +90,7 @@ function Configure() {
 
                             <tr>
                                 <td style={{width: "40px", fontSize:"13px" }}>DOCUMENTS</td>
-                                <td style={{ width: "240px", textAlign: "left", paddingLeft: "20px", fontSize:"14px", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap"}} id="gamepath_dir">{documentsPath}</td>
+                                <td style={{ width: "240px", textAlign: "left", paddingLeft: "20px", fontSize:"14px", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap"}} id="gamepath_dir">{documentsPath ? documentsPath : "Use Default"}</td>
                                 <td className="edgeDots" style={{ width: "30px", fontSize: "15px"}}>
                                 <button tabIndex="-1" type="file" id="gamepath_button" onClick={ updateDocumentsPath }>Change</button>
                                 <input type="file" id="gamepath_input" ref={documentsPath_InputRef} onChange={ updateDocumentsPath } hidden/>

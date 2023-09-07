@@ -60,11 +60,11 @@ function Play() {
 
                 <div id="play_categories">
 
-                    <h2 className="pageCategory edgeDots" ref={pagetab_singleplayer} onClick={()=>setTab_singleplayer()}>
+                    <h2 className="pageCategory edgeDots" ref={pagetab_singleplayer}  onClick={()=>setTab_singleplayer()}>
                         Standalone
                     </h2>
 
-                    <h2 className="pageCategory edgeDots inactive" ref={pagetab_servers} onClick={()=>setTab_servers()}>
+                    <h2 className= { network_mode === 0 ? "pageCategory edgeDots" : "pageCategory edgeDots inactive" }  ref={pagetab_servers} onClick={()=>setTab_servers()}>
                         Server list
                     </h2>
                     

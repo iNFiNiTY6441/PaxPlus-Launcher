@@ -105,10 +105,6 @@ function About() {
                     <a tabIndex="-1" href="https://discord.com/users/88382040772218880" title="open link">Tom Neverwinter</a>
                 </div>
 
-                <div>
-                    <a tabIndex="-1" href="https://www.example.com" title="open link">Tester Slot</a>
-                </div>
-
             </div>
 
         </div>

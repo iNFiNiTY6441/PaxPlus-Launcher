@@ -1,38 +1,61 @@
+# PAX+ Mod Launcher
 
-##   Disclaimer
+<p align="center">
+  <img src="https://i.imgur.com/xp7R8xO.png" alt="Sublime's custom image"/>
+  
+</p>
 
-###  This project is still in development and is not yet meant for general use. 
-### Expect the unexpected.
 
-##   Setup
+<div align="center">
+
+### Mod Launcher, Installer & Server browser for the 2012 Hawken 'PAX' Client
+
+
+  <a href="https://github.com/iNFiNiTY6441/PaxPlus-Launcher/releases">
+
+  <img src="https://img.shields.io/github/v/release/iNFiNiTY6441/PaxPlus-Launcher" alt="GitHub release"></a>
+  <img src="https://img.shields.io/github/downloads/iNFiNiTY6441/PaxPlus-Launcher/latest/total" alt="GitHub release downloads">
+  <img src="https://img.shields.io/discord/390593866690068480" alt="Hawken Refugees Discord Server">
+  </a>
+</div>
+
+## Install
+
+### This is only the launcher, you need a vanilla & extracted version of the PAX-Client
+
+- Download the latest version of PAX+ from the [**Releases Page**](https://github.com/iNFiNiTY6441/PaxPlus-Launcher/releases)
+- **Extract the zip folder**
+- Run `paxplus.exe` and follow setup instructions
+
+## FAQ
+### Automatic game updates
+This launcher automatically keeps your game updated with the latest version of PAX+
+
+### Updating the launcher
+Simply download a newer version of the launcher and replace your old one. Your user settings are saved elsewhere and will be carried over.
+
+### Resetting launcher user settings
+Simply delete
+```C:/Users/<YOU>/PAXPlus_Launcher/``` your launcher will perform the first time setup again on next launch.
+
+## Development
+
+### 🔧 Setting up the repo
 ```
 git clone https://github.com/iNFiNiTY6441/PaxPlus-Launcher.git
 cd PaxPlus-Launcher
 npm install
 ```
-##   Usage
-####  🚀 Run
+### 🚀 Starting launcher
 ```
 npm start
 ```
-####  📦 Build
+### 📦 Build launcher package
 ```
 npm run make
 ```
-##  Launcher paths
-####  UserConfig & local copies of remote data
-✅ Will be auto-created by launcher if missing  
->`/Documents/PAXPlus_Launcher/`
+## Credits
+#### This project wouldn't be possible without these amazing tools:
+### [**UPKUtils**](https://github.com/wghost/UPKUtils) by [**wghost**](https://github.com/wghost)
+### [**UPK Decompressor**](https://github.com/gildor2/UEViewer) by [**gildor**](https://www.gildor.org/)
 
-####  Game .ini files
-✅ Will be automatically set by launcher
->`/Documents/My Games/Hawken_PAXPlus/`
-
-##  IMPORTANT
-
-####  `decompress.exe` and `PatchUPK.exe` need to be manually placed into the launcher base directory for patching to work
-
-**Place exe next to**  
->`forge.config.js`  *When running the project*  
-  **or**  
-`paxplus.exe` *For built releases*

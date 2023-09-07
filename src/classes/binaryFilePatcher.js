@@ -11,7 +11,7 @@ const copyFile = util.promisify(fs.copyFile);
 const exec = util.promisify(require('child_process').exec);
 
 
-const UPK_DECOMPRESSOR_TOOL_PATH = "./decompress.exe";
+const UPK_DECOMPRESSOR_TOOL_PATH = "./dist/decompress.exe";
 const DECOMPRESSED_FOLDER_PATH = "./unpacked";
 
 /**

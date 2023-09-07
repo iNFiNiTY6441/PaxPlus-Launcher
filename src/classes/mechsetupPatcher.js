@@ -3,7 +3,7 @@ const fs = require('fs');
 // Default JSON data for adding a new mech, based on pax+ berserker
 
 
-let mechFilePath = __dirname + "\\" +require('/src/resources/defaultMechsetupEntry.json'); // fs.readFileSync('./src/resources/defaultMechsetupEntry.json')
+let mechFilePath = __dirname + "\\" +require('/src/resources/config/defaultMechsetupEntry.json');
 const defaultMechEntry = JSON.parse(fs.readFileSync(mechFilePath) );
 
 class MechsetupPatcher {
