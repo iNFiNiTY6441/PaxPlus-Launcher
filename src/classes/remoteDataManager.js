@@ -74,7 +74,7 @@ class RemoteDataManager {
                 await this.loadFrom( fallbackLocation, false );
 
             } else {
-                throw new Error("Failed to obtain file & no fallback exists!");
+                throw new Error("Failed to obtain file & no fallback exists!", { cause: initError } );
             }
         }
 
