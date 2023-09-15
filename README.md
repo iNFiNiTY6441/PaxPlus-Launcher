@@ -28,6 +28,9 @@
 - Run `paxplus.exe` and follow setup instructions
 
 ## FAQ
+These are just the basics, for a more in depth technical FAQ, visit the [**Extended FAQ**](docs/FAQ.md)  
+For a technical writeup of what exactly the launcher does, visit the [**Technical Details Page**](docs/details.md)  
+
 ### Automatic game updates
 This launcher automatically keeps your game updated with the latest version of PAX+
 
