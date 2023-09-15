@@ -15,7 +15,7 @@ const { DefaultState } = require("../app/defaultLauncherState.js");
 
 // Launcher attributes
 const LAUNCHER_DEFAULT_ENDPOINT = "http://78.47.65.130:281";//"https://infinity6441.github.io/PaxPlus-Launcher-Remote";//
-const LAUNCHER_VERSION = "1.0.0";//"0.9.5";
+const LAUNCHER_VERSION = "1.0.1";
 const LAUNCHER_UNIQUEID = uuidv4();
 
 const LAUNCHER_HEADERS = {
