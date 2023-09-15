@@ -109,11 +109,12 @@ class RemoteDataManager {
     async loadRemote() {
 
         const response = await axios.get( this.remoteUrl, {
-            timeout: 4000,
-            signal: AbortSignal.timeout(4000),
+            timeout: 30000, // Increase timeout for slow loading clients (4s was too short)
+            signal: AbortSignal.timeout(30000), // Increase timeout for slow loading clients (4s was too short)
             headers: this.requestHeaders
         }).catch( abortError => {
 
+            console.error(abortError);
         });
         
         if ( JSON.stringify(this.data) === JSON.stringify(response.data) ) return;
