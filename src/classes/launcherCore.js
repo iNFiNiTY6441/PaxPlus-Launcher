@@ -359,6 +359,8 @@ class LauncherCore {
             
             // Set launcher into offline mode 
             console.log("[CORE][updateRemoteConfigs]: GOING OFFLINE: Failed retrieving remote launcher config.");
+            console.error( remoteConfigRetrievalError );
+            
             this.launcherState.network_mode = -1;
             this.launcherState.support_status = 'offline'
             this.launcherState.update_interval = LAUNCHER_OFFLINEPOLLINGRATE;
@@ -1026,6 +1028,10 @@ class LauncherCore {
                     }
 
                     
+                } else {
+
+                    // Unknown ini generation error
+                    return this.showPage( "error", installError );
                 }
                 
             }
